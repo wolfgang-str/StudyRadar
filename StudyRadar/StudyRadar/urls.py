@@ -15,20 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-<<<<<<< HEAD
 from StudyRadar.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', Login.as_view()),
-=======
-from StudyRadar.views import Login
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', Login.as_view()),  # Login page from StudyRadar.views
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # JWT login
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # JWT refresh token
->>>>>>> 50582a6 (Resolved merge conflict in urls.py)
+    path("api/login/", LoginView.as_view(), name="login"),
 ]
