@@ -1,60 +1,37 @@
-# from django.views.decorators.csrf import csrf_exempt
-# from django.utils.decorators import method_decorator
-import json
+from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
-from django.views import View
-from StudyRadar.models import Student
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
 
-# @method_decorator(csrf_exempt, name='dispatch')
-class LoginView(View):
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginView(APIView):
     def post(self, request):
         try:
-            # Try to get data from form-data
-            name = request.POST.get("name")
-            password = request.POST.get("password")
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
 
-            # If no form-data is found, try JSON
-            if not name or not password:
-                data = json.loads(request.body)
-                name = data.get("name")
-                password = data.get("password")
+            if not username or not password:
+                return JsonResponse({"message": "Missing username or password"}, status=400)
 
-            # Find user in the database
-            student = Student.objects.get(name=name)
-            
-            # Check password (Warning: Plain text, not secure)
-            if student.password == password:
-                request.session["student_id"] = student.id
-                return JsonResponse({"message": "Login successful"})
+            user = authenticate(username=username, password=password)
 
-            return JsonResponse({"error": "Invalid credentials"}, status=400)
-
-        except Student.DoesNotExist:
-            return JsonResponse({"error": "Invalid credentials"}, status=400)
+            if user:
+                refresh = RefreshToken.for_user(user)
+                return JsonResponse({
+                    "message": "Login successful",
+                    "access_token": str(refresh.access_token),
+                    "refresh_token": str(refresh)
+                }, status=200)
+            else:
+                return JsonResponse({"message": "Invalid credentials"}, status=401)
 
         except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+            return JsonResponse({"message": "Invalid JSON format"}, status=400)
 
-
-
-# from StudyRadar.models import 
-# from project_app.classes.admin import Admin
-# from project_app.classes.ta import Ta
-
-# class Login(View):
-#     def get(self, request):
-#         return render(request, "login.html", {})
-
-#     def post(self, request):
-#         username = request.POST.get('name')  # Django uses 'username' instead of 'name'
-#         password = request.POST.get('password')
-
-#         # Authenticate user using Django's built-in authentication system
-#         user = authenticate(request, username=username, password=password)
-
-#         if user is not None:
-#             login(request, user)  # Creates a session for the user
-#             return redirect('/home/')  # Redirects to the home page
-
-#         else:
-#             return render(request, "login.html", {"errorMessage": "Invalid username or password"})
+        except Exception as e:
+            return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
