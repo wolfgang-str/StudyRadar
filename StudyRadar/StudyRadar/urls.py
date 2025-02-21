@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from StudyRadar.views import *
+from .views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', Login.as_view()),
+    #path('', Login.as_view()),
+    path('api/login/', LoginView.as_view(), name='login'),
 ]
