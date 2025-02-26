@@ -8,8 +8,15 @@ function Dashboard() {
     <div className="Dashboard">
       <header className="App-header">
         <img src={logo} className="logo" alt="logo" />
-	<h1> Welcome back, user! </h1>
       </header>
+	  <div className="body">
+	  	<h1> Welcome back, user! </h1>
+	  	<div>
+	  		<button>Create a new Study Group</button>
+	  		<button>Search for a Study Group</button>
+	  		<button>View My Study Groups</button>
+	  	</div>
+	  </div>
     </div>
   );
 }
