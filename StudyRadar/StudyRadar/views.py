@@ -1,22 +1,37 @@
-from django.shortcuts import render, redirect
-from django.views import View
-from StudyRadar.models import 
-from project_app.classes.admin import Admin
-from project_app.classes.ta import Ta
+from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
 
-
-
-class Login(View):
-    def get(self, request):
-        return render(request, "login.html", {})
-
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginView(APIView):
     def post(self, request):
-        name = request.POST.get('name')
-        password = request.POST.get('password')
-        if Admin().login(name, password):
-            request.session['name'] = name
-            request.session['password'] = password
-            return redirect('/home/')
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
 
-        else:
-            return render(request, "login.html", {"errorMessage": "Invalid username or password"})
+            if not username or not password:
+                return JsonResponse({"message": "Missing username or password"}, status=400)
+
+            user = authenticate(username=username, password=password)
+
+            if user:
+                refresh = RefreshToken.for_user(user)
+                return JsonResponse({
+                    "message": "Login successful",
+                    "access_token": str(refresh.access_token),
+                    "refresh_token": str(refresh)
+                }, status=200)
+            else:
+                return JsonResponse({"message": "Invalid credentials"}, status=401)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"message": "Invalid JSON format"}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
