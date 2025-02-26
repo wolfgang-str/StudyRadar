@@ -20,7 +20,5 @@ from .views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('', Login.as_view()),
     path('api/login/', LoginView.as_view(), name='login'),
-    path('api/signup/', signup, name='signup'),
 ]
