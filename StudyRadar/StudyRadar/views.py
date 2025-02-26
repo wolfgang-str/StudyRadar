@@ -57,7 +57,7 @@ class SignupView(APIView):
                 return JsonResponse({"message": "Missing required fields"}, status=400)
 
             if User.objects.filter(username=username).exists():
-                return JsonResponse({"message": "Username already taken"}, status=400)
+                return JsonResponse({"message": "Username already exists"}, status=400)
 
             # Create a new user
             user = User.objects.create_user(username=username, password=password, email=email)
