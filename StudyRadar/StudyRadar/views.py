@@ -72,3 +72,17 @@ class SignupView(APIView):
 
         except Exception as e:
             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user  # User is available because of IsAuthenticated
+
+
+        navigation_links = {
+
+        }
+
+        return Response({
+            "message": f"Welcome, {user.username}!",
+            "navigation": navigation_links
+        }, status=200)
