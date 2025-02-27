@@ -45,25 +45,39 @@ class LoginView(APIView):
 class SignupView(APIView):
     def post(self, request):
         try:
+            # Parse JSON data from request
             data = json.loads(request.body)
+
+            # Extract fields from request
             username = data.get("username")
             password = data.get("password")
             email = data.get("email")
+            first_name = data.get("first_name")  
+            last_name = data.get("last_name")  
             grad_year = data.get("grad_year")
             phone = data.get("phone")
             major = data.get("major")
 
-            if not username or not password or not email:
+            # Validate required fields
+            if not username or not password or not email or not first_name or not last_name:
                 return JsonResponse({"message": "Missing required fields"}, status=400)
 
             if User.objects.filter(username=username).exists():
                 return JsonResponse({"message": "Username already exists"}, status=400)
 
-            # Create a new user
-            user = User.objects.create_user(username=username, password=password, email=email)
+            # Create a new user in Django's auth system
+            user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
 
-            # Create a new student profile
-            Student.objects.create(user=user, email=email, grad_year=grad_year, phone=phone, major=major)
+            # Create a linked Student profile
+            Student.objects.create(
+                user=user,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                grad_year=grad_year,
+                phone=phone,
+                major=major
+            )
 
             return JsonResponse({"message": "Signup successful"}, status=201)
 
@@ -72,17 +86,18 @@ class SignupView(APIView):
 
         except Exception as e:
             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
-class DashboardView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        user = request.user  # User is available because of IsAuthenticated
+        
+# class DashboardView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         user = request.user  # User is available because of IsAuthenticated
 
 
-        navigation_links = {
+#         navigation_links = {
 
-        }
+#         }
 
-        return Response({
-            "message": f"Welcome, {user.username}!",
-            "navigation": navigation_links
-        }, status=200)
+#         return Response({
+#             "message": f"Welcome, {user.username}!",
+#             "navigation": navigation_links
+#         }, status=200)
