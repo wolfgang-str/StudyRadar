@@ -1,29 +1,18 @@
-.App {
-  text-align: center;
+.logo{
+position: absolute;
+top: 0;
+left: 0;
+height: 100px;
+width: 450px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Dashboard{
+display: flex;
+flex-direction: column;
+justify-content: center;
 }
 
-input{
-	margin-top: 5px;
+h1{
+margin-top: 100px;
 }
-
-.App-header {
-  background-color: #63666A;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
 

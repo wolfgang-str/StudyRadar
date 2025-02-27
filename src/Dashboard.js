@@ -15,10 +15,8 @@ function Dashboard() {
 
   return (
     <div className="Dashboard">
-      <header className="App-header">
-        <img src={logo} className="logo" alt="logo" />
-      </header>
 	  <div className="body">
+        	<img src={logo} className="logo" alt="logo" />
 	  	<h1> Welcome back, user! </h1>
 	  	<form onSubmit={handleSubmit}>
 	  		<button type="submit">Log Out</button>
