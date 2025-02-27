@@ -1,9 +1,18 @@
 import './Dashboard.css';
+import React from 'react';
 import logo from './logo.png';
 import { useState } from "react";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+	e.preventDefault();
+	navigate('/');
+  }
+
   return (
     <div className="Dashboard">
       <header className="App-header">
@@ -11,14 +20,12 @@ function Dashboard() {
       </header>
 	  <div className="body">
 	  	<h1> Welcome back, user! </h1>
-	  	<div>
-	  		<button>Create a new Study Group</button>
-	  		<button>Search for a Study Group</button>
-	  		<button>View My Study Groups</button>
-	  	</div>
+	  	<form onSubmit={handleSubmit}>
+	  		<button type="submit">Log Out</button>
+	  	</form>
 	  </div>
     </div>
   );
 }
 
-export default Login;
+export default Dashboard;
