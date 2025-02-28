@@ -26,6 +26,8 @@ function Login() {
       // Store the access token for authentication
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
+      localStorage.setItem('first_name', response.data.first_name);
+
 	
       navigate('/dashboard');
 

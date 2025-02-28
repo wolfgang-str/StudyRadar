@@ -25,10 +25,13 @@ class LoginView(APIView):
 
             if user:
                 refresh = RefreshToken.for_user(user)
+                student = Student.objects.get(user=user)
+        
                 return JsonResponse({
                     "message": "Login successful",
                     "access_token": str(refresh.access_token),
-                    "refresh_token": str(refresh)
+                    "refresh_token": str(refresh),
+                    "first_name": student.first_name,
                 }, status=200)
             else:
                 return JsonResponse({"message": "Invalid credentials"}, status=401)

@@ -1,27 +1,34 @@
 import './Dashboard.css';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.png';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [firstName, setFirstName] = useState("");
 
-  const handleSubmit = async (e) => {
-	e.preventDefault();
-	navigate('/');
-  }
+  useEffect(() => {
+    // Retrieve the first name stored during login
+    const storedFirstName = localStorage.getItem('first_name');
+    if (storedFirstName) {
+      setFirstName(storedFirstName);
+    }
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate('/');
+  };
 
   return (
     <div className="Dashboard">
-	  <div className="body">
-        	<img src={logo} className="logo" alt="logo" />
-	  	<h1> Welcome back, user! </h1>
-	  	<form onSubmit={handleSubmit}>
-	  		<button type="submit">Log Out</button>
-	  	</form>
-	  </div>
+      <div className="body">
+        <img src={logo} className="logo" alt="logo" />
+        <h1>Welcome{firstName ? `, ${firstName}` : ''}!</h1>
+        <form onSubmit={handleSubmit}>
+          <button type="submit">Log Out</button>
+        </form>
+      </div>
     </div>
   );
 }
