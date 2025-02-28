@@ -86,7 +86,7 @@ const SignUp = () => {
 
       setMessage("Account created successfully! Redirecting to login...");
       setTimeout(() => {
-        window.location.href = "/login"; 
+        window.location.href = "/"; 
       }, 2000);
     } catch (err) {
       setMessage("Sign-up failed: " + (err.response?.data?.message || "Unknown error"));

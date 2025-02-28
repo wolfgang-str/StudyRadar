@@ -1,6 +1,6 @@
-//import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Login.css";
-import SignUp from "./signup";
+import "./signup";
 import logo from "./logo.png";
 import { useState } from "react";
 import axios from 'axios';
@@ -63,7 +63,7 @@ function Login() {
         </form>
         {message && <p>{message}</p>}
         <p>
-          Don't have an account? <a href="/signup">Sign Up</a>
+        Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>
       </header>
     </div>

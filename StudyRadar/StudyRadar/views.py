@@ -87,17 +87,26 @@ class SignupView(APIView):
         except Exception as e:
             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
         
-# class DashboardView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def post(self, request):
-#         user = request.user  # User is available because of IsAuthenticated
+class DashboardView(APIView):
+    permission_classes = [authenticate]
 
-
-#         navigation_links = {
-
-#         }
-
-#         return Response({
-#             "message": f"Welcome, {user.username}!",
-#             "navigation": navigation_links
-#         }, status=200)
+    def post(self, request):
+        try:
+            # Get the student instance linked to the authenticated user
+            student = Student.objects.get(user=request.user)
+            
+            # Define navigation links (update these as needed)
+            navigation_links = {
+                "profile": "/profile",
+                "courses": "/courses",
+                "settings": "/settings"
+            }
+            
+            return Response({
+                "message": f"Welcome, {student.first_name}!",
+                "navigation": navigation_links
+            }, status=200)
+        except Student.DoesNotExist:
+            return Response({
+                "message": "Student profile not found"
+            }, status=404)
