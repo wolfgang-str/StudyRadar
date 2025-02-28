@@ -5,8 +5,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User 
+from StudyRadar.models import Student
 import json
 
+# Login API
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
     def post(self, request):
@@ -35,3 +38,66 @@ class LoginView(APIView):
 
         except Exception as e:
             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
+        
+
+# Register API
+@method_decorator(csrf_exempt, name='dispatch')
+class SignupView(APIView):
+    def post(self, request):
+        try:
+            # Parse JSON data from request
+            data = json.loads(request.body)
+
+            # Extract fields from request
+            username = data.get("username")
+            password = data.get("password")
+            email = data.get("email")
+            first_name = data.get("first_name")  
+            last_name = data.get("last_name")  
+            grad_year = data.get("grad_year")
+            phone = data.get("phone")
+            major = data.get("major")
+
+            # Validate required fields
+            if not username or not password or not email or not first_name or not last_name:
+                return JsonResponse({"message": "Missing required fields"}, status=400)
+
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({"message": "Username already exists"}, status=400)
+
+            # Create a new user in Django's auth system
+            user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
+
+            # Create a linked Student profile
+            Student.objects.create(
+                user=user,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                grad_year=grad_year,
+                phone=phone,
+                major=major
+            )
+
+            return JsonResponse({"message": "Signup successful"}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"message": "Invalid JSON format"}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
+        
+# class DashboardView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         user = request.user  # User is available because of IsAuthenticated
+
+
+#         navigation_links = {
+
+#         }
+
+#         return Response({
+#             "message": f"Welcome, {user.username}!",
+#             "navigation": navigation_links
+#         }, status=200)
