@@ -3,12 +3,15 @@ import "./Login.css";
 import SignUp from "./signup";
 import logo from "./logo.png";
 import { useState } from "react";
-import axios from "axios";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,8 +24,10 @@ function Login() {
       );
 
       // Store the access token for authentication
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("refresh_token", response.data.refresh_token);
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+	
+      navigate('/dashboard');
 
       setMessage("Login Successful!");
       console.log("Login Successful:", response.data);
