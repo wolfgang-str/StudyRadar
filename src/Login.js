@@ -1,5 +1,7 @@
-import './Login.css';
-import logo from './logo.png';
+//import { Link } from "react-router-dom";
+import "./Login.css";
+import SignUp from "./signup";
+import logo from "./logo.png";
 import { useState } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -10,13 +12,14 @@ function Login() {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/login/', 
-        { username, password }, 
+        "http://localhost:8000/api/login/",
+        { username, password },
         { withCredentials: true }
       );
 
@@ -25,12 +28,14 @@ function Login() {
       localStorage.setItem('refresh_token', response.data.refresh_token);
 	
       navigate('/dashboard');
-      setMessage("Login Successful!");
-      console.log('Login Successful:', response.data);
 
+      setMessage("Login Successful!");
+      console.log("Login Successful:", response.data);
     } catch (err) {
-      setMessage("Login Failed: " + (err.response?.data?.message || 'Unknown error'));
-      console.error('Login Failed:', err.response?.data);
+      setMessage(
+        "Login Failed: " + (err.response?.data?.message || "Unknown error")
+      );
+      console.error("Login Failed:", err.response?.data);
     }
   };
 
@@ -57,6 +62,9 @@ function Login() {
           <button type="submit">Login</button>
         </form>
         {message && <p>{message}</p>}
+        <p>
+          Don't have an account? <a href="/signup">Sign Up</a>
+        </p>
       </header>
     </div>
   );

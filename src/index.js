@@ -7,7 +7,8 @@ import Dashboard from './Dashboard';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <Router>
       <Routes>
@@ -15,6 +16,7 @@ root.render(
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
+
 );
 
 // If you want to start measuring performance in your app, pass a function
