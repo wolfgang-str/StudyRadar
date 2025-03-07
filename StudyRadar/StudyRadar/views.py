@@ -113,3 +113,7 @@ class DashboardView(APIView):
             return Response({
                 "message": "Student profile not found"
             }, status=404)
+            
+class AboutusView(APIView):
+    def post(self, request):
+        return 
