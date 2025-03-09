@@ -14,13 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from django.views.generic import TemplateView
 from StudyRadar.views import *
 from .views import LoginView
+from .views import SignupView
+from .views import DashboardView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login/', LoginView.as_view(), name='login'),
     path('api/signup/', SignupView.as_view(), name='signup'),
-    # path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
+    re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
 ]
