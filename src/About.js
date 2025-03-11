@@ -5,7 +5,7 @@ import { useState } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function About) {
+function About() {
   return (
     <div className="About">
     	<p> About Page </p>
