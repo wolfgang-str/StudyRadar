@@ -2,12 +2,18 @@ from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import status
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.utils.crypto import get_random_string
 from django.contrib.auth.models import User 
-from StudyRadar.models import Student
+from django.db import IntegrityError
+from StudyRadar.models import Student, StudyGroup
 import json
+import traceback
 
 # Login API
 @method_decorator(csrf_exempt, name='dispatch')
@@ -89,27 +95,106 @@ class SignupView(APIView):
 
         except Exception as e:
             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
-        
+
 class DashboardView(APIView):
-    permission_classes = [authenticate]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            student = Student.objects.get(user=request.user)
+            # print(f"Fetching groups for student: {student.user.username}")  # Debugging
+
+            groups = student.study_groups.all().values(
+                "id", "name", "description", "subject", "max_members", "join_code"
+            )
+
+            study_groups_list = []
+            for group in groups:
+                try:
+                    group_obj = StudyGroup.objects.get(id=group["id"])
+                    members = group_obj.members.all().values("id", "first_name", "last_name")
+                    group["members"] = list(members)
+                    study_groups_list.append(group)
+                except StudyGroup.DoesNotExist:
+                    print(f"Study Group ID {group['id']} not found!")
+
+            # print(f"Groups fetched successfully: {study_groups_list}") # Debugging
+
+            return JsonResponse({ 
+                "message": f"Welcome, {student.first_name}!",
+                "study_groups": study_groups_list
+            }, status=200)
+
+        except Student.DoesNotExist:
+            print("Student profile not found!")
+            return JsonResponse({"message": "Student profile not found"}, status=404)
+
+        except Exception as e:
+            print(f"Unexpected Error in DashboardView: {str(e)}")
+            return JsonResponse({"message": f"Unexpected error: {str(e)}"}, status=500)
+
+class CreateGroupView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            # Get the student instance linked to the authenticated user
+            data = request.data
             student = Student.objects.get(user=request.user)
-            
-            # Define navigation links (update these as needed)
-            navigation_links = {
-                "profile": "/profile",
-                "courses": "/courses",
-                "settings": "/settings"
-            }
-            
+
+            name = data.get("name")
+            description = data.get("description", "")
+            subject = data.get("subject")
+            max_members = data.get("max_members", 30)
+
+            if not name or not subject:
+                return Response({"message": "Name and subject are required"}, status=400)
+
+            if StudyGroup.objects.filter(name=name).exists():
+                return Response({"message": "A study group with this name already exists"}, status=400)
+
+            # Generate a unique join code
+            join_code = get_random_string(length=8)
+            max_attempts = 5
+            attempts = 0
+
+            while StudyGroup.objects.filter(join_code=join_code).exists() and attempts < max_attempts:
+                join_code = get_random_string(length=8)
+                attempts += 1
+
+            if attempts == max_attempts:
+                return Response({"message": "Could not generate a unique join code. Try again."}, status=500)
+
+            # Create the study group
+            group = StudyGroup.objects.create(
+                name=name,
+                description=description,
+                subject=subject,
+                creator=student,
+                max_members=max_members,
+                join_code=join_code  
+            )
+
+            # Ensure the creator is also a member
+            group.members.add(student)  # Add creator to members
+            group.save()
+
             return Response({
-                "message": f"Welcome, {student.first_name}!",
-                "navigation": navigation_links
-            }, status=200)
+                "message": "Study group created successfully",
+                "group": {
+                    "id": group.id,
+                    "name": group.name,
+                    "description": group.description,
+                    "subject": group.subject,
+                    "max_members": group.max_members,
+                    "join_code": group.join_code  
+                }
+            }, status=201)
+
         except Student.DoesNotExist:
-            return Response({
-                "message": "Student profile not found"
-            }, status=404)
+            return Response({"message": "Student profile not found"}, status=404)
+        except IntegrityError:
+            return Response({"message": "Database error: Could not create study group."}, status=500)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
