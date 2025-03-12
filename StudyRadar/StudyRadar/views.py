@@ -181,20 +181,9 @@ class CreateGroupView(APIView):
             group.save()
 
             return Response({
-                "message": "Study group created successfully",
-                "group": {
-                    "id": group.id,
-                    "name": group.name,
-                    "description": group.description,
-                    "subject": group.subject,
-                    "max_members": group.max_members,
-                    "join_code": group.join_code  
-                }
-            }, status=201)
-
-        except Student.DoesNotExist:
-            return Response({"message": "Student profile not found"}, status=404)
-        except IntegrityError:
-            return Response({"message": "Database error: Could not create study group."}, status=500)
-        except Exception as e:
-            return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
+                "message": "Student profile not found"
+            }, status=404)
+            
+class AboutusView(APIView):
+    def post(self, request):
+        return 
