@@ -27,4 +27,5 @@ urlpatterns = [
     path('api/signup/', SignupView.as_view(), name='signup'),
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
+    
 ]

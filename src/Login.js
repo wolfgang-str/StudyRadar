@@ -67,6 +67,9 @@ function Login() {
         <p>
         Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>
+        <p>
+            <Link to="/about">About us</Link>
+        </p>
       </header>
     </div>
   );

@@ -84,7 +84,8 @@ const SignUp = () => {
         major,
       });
 
-      setMessage("Account created successfully! Redirecting to login...");
+      setMessage("Account created successfully");
+
       setTimeout(() => {
         window.location.href = "/"; 
       }, 2000);
