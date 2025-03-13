@@ -1,7 +1,7 @@
-import './Dashboard.css';
-import React, { useState, useEffect } from 'react';
-import logo from './logo.png';
-import { useNavigate } from 'react-router-dom';
+import "./Dashboard.css";
+import React, { useState, useEffect } from "react";
+import logo from "./logo.png";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ function Dashboard() {
 
   useEffect(() => {
     // Retrieve the first name stored during login
-    const storedFirstName = localStorage.getItem('first_name');
+    const storedFirstName = localStorage.getItem("first_name");
     if (storedFirstName) {
       setFirstName(storedFirstName);
     }
@@ -17,14 +17,14 @@ function Dashboard() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <div className="Dashboard">
       <div className="body">
         <img src={logo} className="logo" alt="logo" />
-        <h1>Welcome{firstName ? `, ${firstName}` : ''}!</h1>
+        <h1>Welcome{firstName ? `, ${firstName}` : ""}!</h1>
         <form onSubmit={handleSubmit}>
           <button type="submit">Log Out</button>
         </form>

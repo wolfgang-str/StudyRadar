@@ -1,10 +1,11 @@
 .signup-container {
     max-width: 400px;
-    margin: auto;
+    margin: 50px auto;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    background: white;
   }
   input {
     width: 100%;
@@ -27,5 +28,20 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-  }
+  }input, button {
+    width: calc(100% - 20px); 
+    max-width: 100%;
+  }.message {
+    color: red;
+    font-weight: normal;
+  }body {
+    background-color: #63666A; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+  
+  
   
