@@ -2,11 +2,7 @@ import "./Dashboard.css";
 import React, { useState, useEffect } from "react";
 import logo from "./logo.png";
 import { useNavigate } from "react-router-dom";
-import './Dashboard.css';
-import React, { useState, useEffect } from 'react';
-import logo from './logo.png';
-import { useNavigate } from 'react-router-dom';
-import GroupDisplay from './GroupDisplay';
+import GroupDisplay from "./GroupDisplay";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -30,8 +26,7 @@ function Dashboard() {
       <div className="body">
         <img src={logo} className="logo" alt="logo" />
         <h1>Welcome{firstName ? `, ${firstName}` : ""}!</h1>
-        <h1>Welcome{firstName ? `, ${firstName}` : ''}!</h1>
-	<GroupDisplay />
+        <GroupDisplay />
         <form onSubmit={handleSubmit}>
           <button type="submit">Log Out</button>
         </form>
