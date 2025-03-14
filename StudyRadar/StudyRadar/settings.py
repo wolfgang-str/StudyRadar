@@ -53,10 +53,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -71,8 +71,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000", 
 ]
 
-CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript from accessing CSRF cookie
+CSRF_COOKIE_HTTPONLY = False  # Prevent JavaScript from accessing CSRF cookie
 CSRF_COOKIE_SECURE = False  # Change to True if using HTTPS in production
+CSRF_COOKIE_SAMESITE = "Lax"  # ✅ Allow CSRF to be sent in cross-origin requests
 
 ROOT_URLCONF = 'StudyRadar.urls'
 

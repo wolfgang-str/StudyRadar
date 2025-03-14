@@ -134,6 +134,7 @@ class DashboardView(APIView):
             print(f"Unexpected Error in DashboardView: {str(e)}")
             return JsonResponse({"message": f"Unexpected error: {str(e)}"}, status=500)
 
+@method_decorator(csrf_exempt, name='dispatch')  # Disable CSRF for this view
 class CreateGroupView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -203,3 +204,51 @@ class CreateGroupView(APIView):
 class AboutusView(APIView):
     def post(self, request):
         return 
+
+
+class UserProfileView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            student = Student.objects.get(user=request.user)
+
+            return Response({
+                "username": request.user.username,
+                "firstName": student.first_name,
+                "lastName": student.last_name,
+                "email": student.email,
+                "phone": student.phone,
+                "gradYear": student.grad_year,
+                "major": student.major,
+            }, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request):
+        try:
+            student = Student.objects.get(user=request.user)
+            data = request.data
+
+            student.first_name = data.get("firstName", student.first_name)
+            student.last_name = data.get("lastName", student.last_name)
+            student.email = data.get("email", student.email)
+            student.phone = data.get("phone", student.phone)
+            student.grad_year = data.get("gradYear", student.grad_year)
+            student.major = data.get("major", student.major)
+            student.save()
+
+            # Update Django's User model email (if changed)
+            request.user.email = student.email
+            request.user.save()
+
+            return Response({"message": "Profile updated successfully!"}, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

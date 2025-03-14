@@ -26,6 +26,8 @@ urlpatterns = [
     path('api/login/', LoginView.as_view(), name='login'),
     path('api/signup/', SignupView.as_view(), name='signup'),
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
+    path("api/profile/", UserProfileView.as_view(), name="user-profile"),
+    path("api/create-group/", csrf_exempt(CreateGroupView.as_view())),
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
     
 ]

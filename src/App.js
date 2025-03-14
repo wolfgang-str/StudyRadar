@@ -5,6 +5,7 @@ import Login from "./Login";
 import SignUp from "./signup";
 import Dashboard from './Dashboard';
 import About from './Aboutus'; 
+import UserProfile from './UserProfile';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Login />} /> {/* Redirect "/" to login */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </div>
     </Router>
