@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "axios";
 import "./UserProfile.css"; // Add styles
 
 const UserProfile = () => {
+
+  const navigate = useNavigate();
+
   const [user, setUser] = useState({
     username: "",
     firstName: "",
@@ -16,11 +20,25 @@ const UserProfile = () => {
 
   // Fetch user profile from backend
   useEffect(() => {
+    const token = localStorage.getItem("access_token"); // Retrieve JWT token
+  
+    if (!token) {
+      setMessage("You are not logged in.");
+      return;
+    }
+  
     axios
-      .get("http://localhost:8000/api/profile/", { withCredentials: true }) // Fetch from backend
+      .get("http://localhost:8000/api/profile/", {
+        headers: { Authorization: `Bearer ${token}` }, // Add token to headers
+        withCredentials: true,
+      })
       .then((response) => setUser(response.data))
-      .catch((error) => setMessage("Failed to load user profile"));
+      .catch((error) => {
+        console.error("Error fetching profile:", error);
+        setMessage("Failed to load user profile. Please log in again.");
+      });
   }, []);
+
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -30,14 +48,35 @@ const UserProfile = () => {
   // Handle profile update
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      setMessage("You are not logged in.");
+      return;
+    }
+
     try {
       await axios.put("http://localhost:8000/api/profile/", user, {
+        headers: { Authorization: `Bearer ${token}` }, // Attach token
         withCredentials: true,
       });
       setMessage("Profile updated successfully!");
+
+      const response = await axios.get("http://localhost:8000/api/profile/", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+  
+      setUser(response.data);
+
     } catch (error) {
+      console.error("Error updating profile:", error);
       setMessage("Failed to update profile");
     }
+  };
+
+  const goToDashboard = () => {
+    navigate("/dashboard"); // Redirects to Dashboard page
+    window.location.reload();
   };
 
   return (
@@ -93,6 +132,9 @@ const UserProfile = () => {
         />
         <button type="submit">Update Profile</button>
       </form>
+
+      <button className="back-button" onClick={goToDashboard}>Back to Dashboard</button>
+
     </div>
   );
 };

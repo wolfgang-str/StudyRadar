@@ -29,4 +29,22 @@
   .message {
     color: green;
   }
+
+  .back-button {
+    margin-top: 20px; /* Adjust this value to move it down */
+    padding: 10px 15px;
+    background-color: #63666A; /* Dark Gray */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+    width: 100%; /* Makes it same width as inputs */
+    text-align: center;
+  }
+  
+  .back-button:hover {
+    background-color: #4a4d50; /* Slightly darker on hover */
+  }
   
