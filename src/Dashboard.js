@@ -1,49 +1,60 @@
-import "./Dashboard.css";
 import React, { useState, useEffect } from "react";
-import logo from "./logo.png";
 import { useNavigate } from "react-router-dom";
-import GroupDisplay from "./GroupDisplay";
-import profileIcon from "./profile-icon.png"; 
+import "./Dashboard.css";
+import logo from "./logo.png";
+import profileIcon from "./profile-icon.png";
 
 function Dashboard() {
-  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Retrieve the first name stored during login
     const storedFirstName = localStorage.getItem("first_name");
-    if (storedFirstName) {
-      setFirstName(storedFirstName);
-    }
+    if (storedFirstName) setFirstName(storedFirstName);
   }, []);
 
-  const handleLogout = (e) => {
-    e.preventDefault();
-    localStorage.clear(); // Clear stored user data
+  const handleLogout = () => {
+    localStorage.clear();
     navigate("/");
   };
 
-  const goToProfile = () => {
-    navigate("/profile"); // Navigate to the UserProfile page
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
-    <div className="Dashboard">
-      <div className="body">
-        {/* Navigation Bar */}
-        <div className="nav-bar">
-          <img src={logo} className="logo" alt="logo" />
-          <div className="profile-container" onClick={goToProfile}>
-            <img src={profileIcon} className="profile-icon" alt="User Profile" />
-          </div>
+    <div className="dashboard-container">
+      {/* Top Bar */}
+      <div className="top-bar">
+  <div className="hamburger" onClick={toggleSidebar}>
+    &#9776;
+  </div>
+
+  <div className="logo-wrapper">
+    <img src={logo} className="logo-center" alt="logo" />
+  </div>
+
+  <div className="profile-icon-wrapper" onClick={() => navigate("/profile")}>
+    <img src={profileIcon} className="profile-icon" alt="Profile" />
+  </div>
+</div>
+
+
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <div className="sidebar">
+          <p onClick={() => navigate("/groups")}>Create Group</p>
+          <p onClick={() => navigate("/profile")}>Profile</p>
+          <p onClick={() => navigate("/about")}>About</p>
+          <p onClick={handleLogout}>Log Out</p>
         </div>
+      )}
 
+      {/* Main content */}
+      <div className="main-content">
         <h1>Welcome{firstName ? `, ${firstName}` : ""}!</h1>
-        <GroupDisplay />
-
-        <form onSubmit={handleLogout}>
-          <button type="submit">Log Out</button>
-        </form>
+        <p>Select an option from the menu.</p>
       </div>
     </div>
   );
