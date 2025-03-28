@@ -1,25 +1,89 @@
-.logo{
-position: absolute;
-top: 0;
-left: 0;
-height: 100px;
-width: 450px;
+.dashboard-container {
+  height: 100vh;
+  background-color: #f2f2f2;
 }
 
-.Dashboard{
-display: flex;
-flex-direction: column;
-justify-content: center;
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding: 0 20px;
+  background-color: #f2f2f2;
+  position: relative;
 }
 
-h1{
-margin-top: 100px;
+.hamburger {
+  font-size: 30px;
+  cursor: pointer;
+  color: #4cd137; /* StudyRadar Green */
+  z-index: 1001;
+}
+
+.logo-wrapper {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.logo-center {
+  height: 80px;
+  max-width: 100%;
+}
+
+.profile-icon-wrapper {
+  z-index: 1001;
 }
 
 .profile-icon {
-    width: 40px;  /* Adjust size as needed */
-    height: 40px;
-    border-radius: 50%; /* Makes it circular */
-    border: 2px solid white;
-  }
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+}
 
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background-color: #2d2f33;
+  color: white;
+  padding-top: 80px;
+  font-size: 20px;
+  z-index: 1000;
+  transition: 0.3s;
+}
+
+.sidebar p {
+  padding: 15px 20px;
+  cursor: pointer;
+}
+
+.sidebar p:hover {
+  background-color: #444;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 100px);
+  text-align: center;
+}
+
+.main-content h1 {
+  margin-top: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+.main-content p {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555;
+}
