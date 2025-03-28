@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const GroupSearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-
+const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleSearchSubmit = async (event) => {
+  const handleSearchSubmit = (event) => {
     event.preventDefault();
   };
 
   return (
-    <div>
+    <div style={{ marginBottom: '20px' }}>
       <form onSubmit={handleSearchSubmit}>
         <input
           type="text"
@@ -27,4 +25,3 @@ const GroupSearchBar = () => {
 };
 
 export default GroupSearchBar;
-

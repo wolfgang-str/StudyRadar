@@ -39,7 +39,7 @@ function Layout() {
       {sidebarOpen && (
         <div className="sidebar">
           <p onClick={() => navigate("/dashboard")}>Dashboard</p>
-          <p onClick={() => navigate("/groups")}>Create Group</p>
+          <p onClick={() => navigate("/groups")}>Joined Groups</p>
           <p onClick={() => navigate("/profile")}>Profile</p>
           <p onClick={handleLogout}>Log Out</p>
         </div>
