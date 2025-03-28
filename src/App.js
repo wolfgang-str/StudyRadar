@@ -7,6 +7,7 @@ import Dashboard from "./Dashboard";
 import About from "./Aboutus";
 import UserProfile from "./UserProfile";
 import GroupPage from "./GroupPage";
+import Layout from "./Layout"; 
 
 function App() {
   return (
@@ -16,10 +17,18 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/" element={<Login />} /> {/* Redirect "/" to login */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* Pages that share the Layout */}
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/groups" element={<GroupPage />} />
+            <Route path="/profile" element={<UserProfile />} />
+          </Route>
           <Route path="/about" element={<About />} />
+
+          {/* <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<UserProfile />} />
-          <Route path="/groups" element={<GroupPage />} />
+          <Route path="/groups" element={<GroupPage />} /> */}
         </Routes>
       </div>
     </Router>
