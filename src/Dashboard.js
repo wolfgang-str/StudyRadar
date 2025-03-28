@@ -34,10 +34,6 @@ function Dashboard() {
   <div className="logo-wrapper">
     <img src={logo} className="logo-center" alt="logo" />
   </div>
-
-  <div className="profile-icon-wrapper" onClick={() => navigate("/profile")}>
-    <img src={profileIcon} className="profile-icon" alt="Profile" />
-  </div>
 </div>
 
 
