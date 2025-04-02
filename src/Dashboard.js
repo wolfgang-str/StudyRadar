@@ -9,11 +9,21 @@ function Dashboard() {
     if (storedFirstName) setFirstName(storedFirstName);
   }, []);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate('/');
+  };
+
   return (
-    <>
-      <h1>Welcome{firstName ? `, ${firstName}` : ""}!</h1>
-      <p>Select an option from the menu.</p>
-    </>
+    <div className="Dashboard">
+      <div className="body">
+        <img src={logo} className="logo" alt="logo" />
+        <h1>Welcome{firstName ? `, ${firstName}` : ''}!</h1>
+        <form onSubmit={handleSubmit}>
+          <button type="submit">Log Out</button>
+        </form>
+      </div>
+    </div>
   );
 }
 
