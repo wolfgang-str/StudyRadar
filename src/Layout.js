@@ -1,4 +1,3 @@
-// Layout.js
 import React, { useState, useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import "./Dashboard.css";
@@ -40,6 +39,7 @@ function Layout() {
         <div className="sidebar">
           <p onClick={() => navigate("/dashboard")}>Dashboard</p>
           <p onClick={() => navigate("/groups")}>Joined Groups</p>
+          <p onClick={() => navigate("/create-group")}>Create Group</p>
           <p onClick={() => navigate("/profile")}>Profile</p>
           <p onClick={handleLogout}>Log Out</p>
         </div>

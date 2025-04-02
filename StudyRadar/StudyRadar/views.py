@@ -204,8 +204,6 @@ class AboutusView(APIView):
     def post(self, request):
         return 
 
-
-
 class CreateGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
