@@ -42,5 +42,8 @@
     margin: 0;
 }
   
-  
+.custom-major-wrapper {
+  margin-top: 10px;
+  text-align: left;
+}
   

@@ -11,7 +11,8 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [gradYear, setGradYear] = useState("");  // Add gradYear field
   const [phone, setPhone] = useState("");  // Add phone field
-  const [major, setMajor] = useState(""); // Add major field
+  const [major, setMajor] = useState("");
+  const [customMajor, setCustomMajor] = useState("");
   const [message, setMessage] = useState("");
 
     // Email validation regex
@@ -56,18 +57,20 @@ const SignUp = () => {
       return;
     }
 
-    if (!gradYear.match(/^\d{4}$/)) {
+    if (gradYear && !gradYear.match(/^\d{4}$/)) {
       setMessage("Please enter a valid graduation year (e.g., 2025).");
       return;
     }
 
-    if (!phone.match(/^\d{10,15}$/)) {
+    if (phone && !phone.match(/^\d{10,15}$/)) {
       setMessage("Please enter a valid phone number (10-15 digits).");
       return;
     }
 
-    if (major.length < 2) {
-      setMessage("Major must be at least 2 characters long.");
+    const finalMajor = major === "Other" ? customMajor : major;
+
+    if (!finalMajor || finalMajor.length < 2) {
+      setMessage("Please enter a valid major.");
       return;
     }
 
@@ -81,7 +84,7 @@ const SignUp = () => {
         password,
         grad_year: gradYear,
         phone,
-        major,
+        major: finalMajor,
       });
 
       setMessage("Account created successfully");
@@ -143,25 +146,50 @@ const SignUp = () => {
         />
         <input
           type="text"
-          placeholder="Graduation Year"
+          placeholder="Graduation Year (optional)"
           value={gradYear}
           onChange={(e) => setGradYear(e.target.value)}
-          required
         />
         <input
           type="text"
-          placeholder="Phone Number"
+          placeholder="Phone Number (optional)"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          required
         />
-        <input
-          type="text"
-          placeholder="Major"
-          value={major}
-          onChange={(e) => setMajor(e.target.value)}
-          required
-        />
+
+        <div>
+          <label htmlFor="major">Select Major:</label>
+          <select
+            value={major}
+            onChange={(e) => setMajor(e.target.value)}
+            required
+          >
+            <option value="">-- Select Major --</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Biology">Biology</option>
+            <option value="Psychology">Psychology</option>
+            <option value="Business">Business</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {major === "Other" && (
+          <div className="custom-major-wrapper">
+            <label htmlFor="customMajor">Enter your major:</label>
+            <input
+              type="text"
+              id="customMajor"
+              placeholder="Your Major"
+              value={customMajor}
+              onChange={(e) => setCustomMajor(e.target.value)}
+              required
+            />
+          </div>
+        )}
+
         <button type="submit">Sign Up</button>
       </form>
       <p>

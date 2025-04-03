@@ -19,7 +19,8 @@ from django.views.generic import TemplateView
 from StudyRadar.views import *
 from .views import LoginView
 from .views import SignupView
-from .views import DashboardView
+from .views import DashboardView, AboutusView, CreateGroupView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,6 +29,8 @@ urlpatterns = [
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
     path("api/profile/", UserProfileView.as_view(), name="user-profile"),
     path("api/create-group/", csrf_exempt(CreateGroupView.as_view())),
+    path('about/', AboutusView.as_view(), name='about'),
+    path('api/create-group/', CreateGroupView.as_view(), name='create-group'),
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
     
 ]
