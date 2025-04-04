@@ -23,7 +23,7 @@ class StudyGroup(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=255, blank=True)
-    subject = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100, blank=True, null=True)
     creator = models.ForeignKey('Student', on_delete=models.CASCADE, related_name="created_groups")
     members = models.ManyToManyField('Student', related_name="study_groups", blank=True) 
 
@@ -31,18 +31,18 @@ class StudyGroup(models.Model):
     join_code = models.CharField(max_length=10, unique=True, null=True, blank=True)
 
     
-class StudyGroup(models.Model):
-    created_by = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='study_groups')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_groups')
-    major = models.CharField(max_length=100)
-    meeting_location = models.CharField(max_length=100)
-    meeting_start = models.DateTimeField()
-    meeting_end = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
+# class StudyGroup(models.Model):
+#     created_by = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='study_groups')
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_groups')
+#     major = models.CharField(max_length=100)
+#     meeting_location = models.CharField(max_length=100)
+#     meeting_start = models.DateTimeField()
+#     meeting_end = models.DateTimeField()
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.course.name} ({self.major}) by {self.created_by.user.username} @ {self.meeting_location} from {self.meeting_start} to {self.meeting_end}"
+#     def __str__(self):
+#         return f"{self.course.name} ({self.major}) by {self.created_by.user.username} @ {self.meeting_location} from {self.meeting_start} to {self.meeting_end}"
 
-    class Meta:
-        unique_together = (("meeting_start", "meeting_end", "meeting_location"),)
+#     class Meta:
+#         unique_together = (("meeting_start", "meeting_end", "meeting_location"),)
 

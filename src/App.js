@@ -28,8 +28,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/groups" element={<GroupPage />} />
             <Route path="/profile" element={<UserProfile />} />
+            <Route path="/create-group" element={<GroupCreation />} />
           </Route>
-          <Route path="/create-group" element={<GroupCreation />} />
           <Route path="/about" element={<About />} />
 
           {/* <Route path="/dashboard" element={<Dashboard />} />
