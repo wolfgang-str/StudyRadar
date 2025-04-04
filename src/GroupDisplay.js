@@ -42,7 +42,7 @@ const GroupDisplay = ({ searchQuery }) => {
     group.subject.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
+return (
     <div className="group-list">
       <h2>My Joined Groups</h2>
       {loading ? (
@@ -53,6 +53,10 @@ const GroupDisplay = ({ searchQuery }) => {
             <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
             <p>{group.description || "No description provided."}</p>
             <p><strong>Join Code:</strong> {group.join_code}</p>
+
+            <Link to={`/group/${group.id}`}>
+              <button className="view-group-btn">View Group</button>
+            </Link>
           </div>
         ))
       ) : (
@@ -61,5 +65,4 @@ const GroupDisplay = ({ searchQuery }) => {
     </div>
   );
 };
-
 export default GroupDisplay;
