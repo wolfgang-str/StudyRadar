@@ -10,7 +10,7 @@ import UserProfile from "./UserProfile";
 import GroupPage from "./GroupPage";
 import Layout from "./Layout"; 
 import GroupCreation from './GroupCreation';
-
+import GroupDetail from './GroupDetail';
 
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/" element={<Login />} /> {/* Redirect "/" to login */}
-
+	  <Route path="/group/:groupId" element={<GroupDetail />} />
           
           {/* Pages that share the Layout */}
           <Route element={<Layout />}>
