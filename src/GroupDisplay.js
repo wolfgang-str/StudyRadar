@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './GroupDisplay.css';
+import { Link } from 'react-router-dom';
 
 const GroupDisplay = ({ searchQuery }) => {
   const [studyGroups, setStudyGroups] = useState([]);
@@ -52,11 +53,12 @@ const GroupDisplay = ({ searchQuery }) => {
             <p>Loading...</p>
           ) : filteredGroups.length > 0 ? (
             filteredGroups.map((group) => (
-              <div className="group-card" key={group.id}>
-                <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
-                <p>{group.description || "No description provided."}</p>
-                <p><strong>Join Code:</strong> {group.join_code}</p>
-              </div>
+              <Link to={`/group/${group.id}`} key={group.id} className="group-card-link">
+                <div className="group-card clickable">
+                  <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
+                  <p><strong>Join Code:</strong> {group.join_code}</p>
+                </div>
+              </Link>
             ))
           ) : (
             <p>No matching groups found.</p>
@@ -66,11 +68,12 @@ const GroupDisplay = ({ searchQuery }) => {
         <div className="group-panel recommended-panel">
           <h2>Recommended Groups</h2>
           {recommendations.map((group) => (
-            <div className="group-card recommended" key={`rec-${group.id}`}>
-              <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
-              <p>{group.description || "No description provided."}</p>
-              <p><strong>Join Code:</strong> {group.join_code}</p>
-            </div>
+            <Link to={`/group/${group.id}`} key={group.id} className="group-card-link">
+              <div className="group-card clickable recommended">
+                <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
+                <p><strong>Join Code:</strong> {group.join_code}</p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

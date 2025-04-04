@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.utils.crypto import get_random_string
 from django.contrib.auth.models import User 
+from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from StudyRadar.models import Student, StudyGroup
 import json
@@ -401,3 +402,24 @@ class UserProfileView(APIView):
             return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+class GroupDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, group_id):
+        group = get_object_or_404(StudyGroup, id=group_id)
+        members = group.members.all()
+        creator_name = group.creator.first_name
+        member_names = [m.first_name for m in members]
+
+        return Response({
+            "id": group.id,
+            "name": group.name,
+            "description": group.description,
+            "subject": group.subject,
+            "max_members": group.max_members,
+            "join_code": group.join_code,
+            "creator": creator_name,
+            "members": member_names
+        })
