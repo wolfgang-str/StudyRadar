@@ -355,6 +355,53 @@ class CreateGroupView(APIView):
 #         except Exception as e:
 #             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
 
+class CreateGroupView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            class_name = data.get("className")
+            meeting_location = data.get("location")
+            meeting_start_str = data.get("meetingStart")
+            meeting_end_str = data.get("meetingEnd")
+
+            if not class_name or not meeting_location or not meeting_start_str or not meeting_end_str:
+                return JsonResponse({"message": "Missing required fields."}, status=400)
+
+            # Parse meeting start and end; expecting ISO format strings
+            meeting_start = datetime.fromisoformat(meeting_start_str)
+            meeting_end = datetime.fromisoformat(meeting_end_str)
+
+            # Retrieve the Student instance associated with the authenticated user
+            student = Student.objects.get(user=request.user)
+            # Use the student's major from their profile
+            group_major = student.major
+
+            # Find or create the course using the class name.
+            course, created = Course.objects.get_or_create(
+                name=class_name, 
+                defaults={'dateTime': meeting_start, 'user_id': request.user}
+            )
+            
+            # Create the study group
+            study_group = StudyGroup.objects.create(
+                created_by=student,
+                course=course,
+                major=group_major,
+                meeting_location=meeting_location,
+                meeting_start=meeting_start,
+                meeting_end=meeting_end
+            )
+
+            return JsonResponse({"message": "Study group created successfully."}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({"message": "Invalid JSON format."}, status=400)
+        except Student.DoesNotExist:
+            return JsonResponse({"message": "Student profile not found."}, status=404)
+        except Exception as e:
+            return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
+
 
 class UserProfileView(APIView):
     authentication_classes = [JWTAuthentication]

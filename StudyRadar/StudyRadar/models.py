@@ -46,3 +46,4 @@ class StudyGroup(models.Model):
 #     class Meta:
 #         unique_together = (("meeting_start", "meeting_end", "meeting_location"),)
 
+
