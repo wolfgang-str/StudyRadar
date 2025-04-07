@@ -1,24 +1,59 @@
-.group-list {
-  width: 320px;
-  margin: 40px auto;
-  padding: 20px;
+/* Wrapper for page layout */
+.group-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Main container that holds both sections side by side */
+.group-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Shared style for each section panel */
+.group-panel {
+  flex: 1; /* Let each panel take 50% of the row (with gap) */
   background-color: #ffffff;
+  padding: 20px;
   border: 2px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 0; /* ensures flex children don’t overflow */
+}
+
+/* Header styling */
+.group-panel h2 {
+  color: #2c2c2c;
+  font-size: 1.4em;
+  margin-bottom: 20px;
   text-align: center;
 }
 
+/* Group card box */
 .group-card {
   background-color: #f9f9f9;
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   text-align: left;
 }
 
+/* Recommended group card with green accent */
+.group-card.recommended {
+  border-left: 5px solid #4caf50;
+  background-color: #f1fff1;
+  box-shadow: 0 2px 6px rgba(0, 128, 0, 0.08);
+}
+
+/* Group title and subject tag */
 .group-card h4 {
   margin: 0 0 6px 0;
   font-size: 1.1em;
@@ -29,9 +64,10 @@
   font-weight: normal;
   color: #666;
   font-size: 0.85em;
-  margin-left: 5px;
+  margin-left: 6px;
 }
 
+/* Description and Join Code */
 .group-card p {
   margin: 6px 0;
   font-size: 0.95em;
@@ -42,16 +78,39 @@
   color: #000;
 }
 
+/* Body background */
 body, html {
-  height: 100%;
   margin: 0;
-  background-color: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
+  background-color: #f0f2f5;
+  font-family: Arial, sans-serif;
+  height:auto;
+  display: block;
 }
 
-h2 {
-  color: #333;
-  margin-bottom: 20px;
+.group-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.group-card.clickable {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  cursor: pointer;
+}
+
+.group-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+.group-card.recommended {
+  border-left: 5px solid #3f51b5; /* blue accent */
+  background-color: #f1f5ff;       /* very soft blue */
+  box-shadow: 0 2px 6px rgba(63, 81, 181, 0.1); /* soft blue shadow */
+}
+
+.group-card.recommended.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15);
 }
