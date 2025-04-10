@@ -44,6 +44,34 @@ const GroupDisplay = ({ searchQuery }) => {
     group.subject.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleJoinGroup = async (groupId) => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      console.error("No auth token found.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:8000/api/join-group/${groupId}/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to join group");
+      }
+  
+      // Re-fetch study groups to update UI
+      fetchStudyGroups();
+    } catch (error) {
+      console.error("Join group failed:", error.message);
+    }
+  };
+  
   return (
     <div className="group-wrapper">
       <div className="group-container">
@@ -72,6 +100,7 @@ const GroupDisplay = ({ searchQuery }) => {
               <div className="group-card clickable recommended">
                 <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
                 <p><strong>Join Code:</strong> {group.join_code}</p>
+                <button onClick={() => handleJoinGroup(group.id)}>Join Group</button>
               </div>
             </Link>
           ))}
