@@ -22,10 +22,7 @@ const filterByDesc = (searchQuery) => {
     return fullGroups;
   }
   return fullGroups.filter((group) => group.description.toLowerCase().includes(searchQuery.toLowerCase()));
-}
-  */
-
-
+}*/
 
 const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
   const query = useRef();
@@ -38,7 +35,7 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    
+
     const token = localStorage.getItem('access_token');
     if (!token) {
       setError('You must be logged in to fetch from the database.');
@@ -46,8 +43,10 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
     }
 
     const groupData = {
-      name: 
-    }
+      groupName,
+      subject,
+      description
+    };
 
     const fetchGroups = async (query) => {
       try {
@@ -58,10 +57,10 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             },
-            body: 
+            body: JSON.stringify(groupData)
           }
         );
-  
+
         const data = await response.json();
         if (response.ok) {
           setGroups = [...response.data];
@@ -73,25 +72,25 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
 
     }
 
-      const queryVal = query.current.value;
-      fetchGroups(queryVal.trim());
-    };
-
-
-    return (
-      <div style={{ marginBottom: '20px' }}>
-        <form onSubmit={handleSearchSubmit}>
-          <input
-            ref={query}
-            type="text"
-            placeholder="Search groups..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-          <button type="submit">Search</button>
-        </form>
-      </div>
-    );
+    const queryVal = query.current.value;
+    fetchGroups(queryVal.trim());
   };
 
-  export default GroupSearchBar;
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <form onSubmit={handleSearchSubmit}>
+        <input
+          ref={query}
+          type="text"
+          placeholder="Search groups..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  );
+};
+
+export default GroupSearchBar;
