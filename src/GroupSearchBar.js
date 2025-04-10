@@ -1,12 +1,27 @@
 import { React, useRef, useState } from 'react';
 
 /*
+const fullGroups = StudyGroup.Objects.all();
+
 const filterByName = (searchQuery) => {
-  const fullGroups = StudyGroup.Objects.all();
   if (searchQuery === "") {
     return fullGroups;
   }
   return fullGroups.filter((group) => group.name.toLowerCase().includes(searchQuery.toLowerCase()));
+}
+
+const filterBySubject = (searchQuery) => {
+  if (searchQuery === "") {
+    return fullGroups;
+  }
+  return fullGroups.filter((group) => group.subject.toLowerCase().includes(searchQuery.toLowerCase()));
+}
+
+const filterByDesc = (searchQuery) => {
+  if (searchQuery === "") {
+    return fullGroups;
+  }
+  return fullGroups.filter((group) => group.description.toLowerCase().includes(searchQuery.toLowerCase()));
 }
   */
 
