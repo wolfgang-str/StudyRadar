@@ -470,3 +470,32 @@ class GroupDetailView(APIView):
             "creator": creator_name,
             "members": member_names
         })
+
+    def post(self, request, group_id):
+        """
+        Join the group with the given group_id.
+        """
+        try:
+            student = Student.objects.get(user=request.user)
+            group = get_object_or_404(StudyGroup, id=group_id)
+
+            # Check if already a member
+            if group.members.filter(id=student.id).exists():
+                return Response({"message": "You are already a member of this group"}, status=400)
+
+            # Check if the group has reached its capacity
+            if group.members.count() >= group.max_members:
+                return Response({"message": "This group is already full"}, status=400)
+
+            # Add the student to the group
+            group.members.add(student)
+            group.save()
+
+            return Response({"message": "Joined group successfully"}, status=200)
+
+        except Student.DoesNotExist:
+            return Response({"message": "Student profile not found"}, status=404)
+        except IntegrityError:
+            return Response({"message": "Database error: Could not join the group."}, status=500)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
