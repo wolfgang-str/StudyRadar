@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import logo from "./logo.png";
+import logo from "./components/logo.png";
 import React, { useEffect } from 'react';
-import './Aboutus.css';
+import './CSS/Aboutus.css';
 
 const About = () => {
   useEffect(() => {

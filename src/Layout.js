@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import "./Dashboard.css";
-import logo from "./logo.png";
+import "./CSS/Dashboard.css";
+import logo from "./components/logo.png";
 
 function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './GroupDisplay.css';
+import '../CSS/GroupDisplay.css';
 import { Link } from 'react-router-dom';
 
 const GroupDisplay = ({ searchQuery }) => {

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./CSS/Login.css";
 import "./signup";
-import logo from "./logo.png";
+import logo from "./components/logo.png";
 import { useState } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
