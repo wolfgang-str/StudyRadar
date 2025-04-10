@@ -30,7 +30,9 @@ urlpatterns = [
     path("api/profile/", UserProfileView.as_view(), name="user-profile"),
     path("api/create-group/", csrf_exempt(CreateGroupView.as_view())),
     path('about/', AboutusView.as_view(), name='about'),
-    path('api/create-group/', CreateGroupView.as_view(), name='create-group'),
+    path('api/groups/<int:group_id>/', GroupDetailView.as_view(), name='group-detail'),
+    # path('api/create-group/', CreateGroupView.as_view(), name='create-group'),
+
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
     
 ]

@@ -13,6 +13,7 @@ import GroupCreation from './GroupCreation';
 import GroupDetail from './GroupDetail';
 
 
+
 function App() {
   return (
     <Router>
@@ -21,16 +22,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/" element={<Login />} /> {/* Redirect "/" to login */}
-	  <Route path="/group/:groupId" element={<GroupDetail />} />
-          
+
           {/* Pages that share the Layout */}
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/groups" element={<GroupPage />} />
             <Route path="/profile" element={<UserProfile />} />
+            <Route path="/create-group" element={<GroupCreation />} />
+            <Route path="/group/:groupId" element={<GroupDetail />} />
           </Route>
-          <Route path="/create-group" element={<GroupCreation />} />
           <Route path="/about" element={<About />} />
+
 
           {/* <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<UserProfile />} />
