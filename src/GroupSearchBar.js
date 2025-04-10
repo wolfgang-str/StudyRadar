@@ -36,6 +36,7 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
   const handleSearchSubmit = (event) => {
     event.preventDefault();
 
+    /*
     const token = localStorage.getItem('access_token');
     if (!token) {
       setError('You must be logged in to fetch from the database.');
@@ -48,6 +49,7 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
       description
     };
 
+    
     const fetchGroups = async (query) => {
       try {
         const response = await fetch('http://localhost:8000/api', //query goes in here somewhere...?
@@ -70,10 +72,11 @@ const GroupSearchBar = ({ searchQuery, setSearchQuery }) => {
       }
 
 
-    }
+    } */
 
-    const queryVal = query.current.value;
-    fetchGroups(queryVal.trim());
+    //const queryVal = query.current.value;
+    //fetchGroups(queryVal.trim());
+
   };
 
 
