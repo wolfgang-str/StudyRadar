@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import GroupDisplay from './GroupDisplay';
-import GroupSearchBar from './GroupSearchBar';
+import GroupDisplay from './components/GroupDisplay';
+import GroupSearchBar from './components/GroupSearchBar';
 
 const GroupPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
