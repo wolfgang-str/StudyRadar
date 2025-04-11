@@ -4,13 +4,16 @@
 }
 
 .top-bar {
+  position: sticky;              /* ✅ stays at top when scrolling */
+  top: 0;                        
+  z-index: 1002;                 
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 100px;
   padding: 0 20px;
   background-color: #f2f2f2;
-  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* optional: visual depth */
 }
 
 .hamburger {
@@ -49,8 +52,9 @@
   left: 0;
   width: 220px;
   height: 100vh;
-  background-color: #2d2f33;
-  color: white;
+  background-color: #ffffff;
+  color: #333;
+  border-right: 1px solid #ddd;
   padding-top: 80px;
   font-size: 20px;
   z-index: 1000;
@@ -63,15 +67,16 @@
 }
 
 .sidebar p:hover {
-  background-color: #444;
+  background-color: #f0f0f0;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 10px; 
   justify-content: center;
-  height: calc(100vh - 100px);
+  min-height: calc(100vh - 100px); 
   text-align: center;
 }
 

@@ -1,0 +1,19 @@
+.group-page-wrapper {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .group-search-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    background-color: transparent;
+    z-index: 10;
+  }
+  
+  .group-display-wrapper {
+    width: 100%;
+    display: block;
+  }

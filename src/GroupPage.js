@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import GroupDisplay from './GroupDisplay';
 import GroupSearchBar from './GroupSearchBar';
+import GroupDisplay from './GroupDisplay';
+import './GroupPage.css';
 
 const GroupPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div style={{ padding: '20px' }}>
-      <GroupSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-      <GroupDisplay searchQuery={searchQuery} />
+    <div className="group-page-wrapper">
+      <div className="group-search-wrapper">
+        <GroupSearchBar setSearchQuery={setSearchQuery} />
+      </div>
+
+      <div className="group-display-wrapper">
+        <GroupDisplay searchQuery={searchQuery} />
+      </div>
     </div>
   );
 };

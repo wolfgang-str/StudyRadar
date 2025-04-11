@@ -3,9 +3,11 @@ import './GroupDisplay.css';
 import { Link } from 'react-router-dom';
 
 const GroupDisplay = ({ searchQuery }) => {
-  const [studyGroups, setStudyGroups] = useState([]);
+  const [studyGroups, setStudyGroups] = useState([]); // joined groups
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
 
   const fetchStudyGroups = async () => {
     const token = localStorage.getItem('access_token');
@@ -39,10 +41,41 @@ const GroupDisplay = ({ searchQuery }) => {
     fetchStudyGroups();
   }, []);
 
-  const filteredGroups = studyGroups.filter(group =>
-    group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    group.subject.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const trimmed = searchQuery.trim();
+
+    if (!trimmed || trimmed.length < 2) {
+      setSearching(false);
+      setSearchResults([]);
+      return;
+    }
+
+    const fetchSearchResults = async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/search-groups/?q=${encodeURIComponent(trimmed)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) throw new Error(`Search error: ${response.status}`);
+        const data = await response.json();
+
+        setSearchResults(data.results);
+        setSearching(true);
+      } catch (err) {
+        console.error("Search failed:", err.message);
+        setSearchResults([]);
+        setSearching(false);
+      }
+    };
+
+    fetchSearchResults();
+  }, [searchQuery]);
 
   const handleJoinGroup = async (groupId) => {
     const token = localStorage.getItem("access_token");
@@ -50,7 +83,7 @@ const GroupDisplay = ({ searchQuery }) => {
       console.error("No auth token found.");
       return;
     }
-  
+
     try {
       const response = await fetch(`http://localhost:8000/api/join-group/${groupId}/`, {
         method: "POST",
@@ -59,28 +92,41 @@ const GroupDisplay = ({ searchQuery }) => {
           "Content-Type": "application/json"
         }
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to join group");
       }
-  
-      // Re-fetch study groups to update UI
+
       fetchStudyGroups();
     } catch (error) {
       console.error("Join group failed:", error.message);
     }
   };
-  
+
   return (
     <div className="group-wrapper">
+      {searching && searchResults.length > 0 && searchQuery.trim().length >= 2 && (
+        <div className="group-search-results">
+          {searchResults.map((group) => (
+            <Link to={`/group/${group.id}`} key={group.id} className="group-card-link">
+              <div className="group-card clickable">
+                <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
+                <p><strong>Join Code:</strong> {group.join_code}</p>
+                <p>{group.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
       <div className="group-container">
         <div className="group-panel">
           <h2>My Joined Groups</h2>
           {loading ? (
             <p>Loading...</p>
-          ) : filteredGroups.length > 0 ? (
-            filteredGroups.map((group) => (
+          ) : studyGroups.length > 0 ? (
+            studyGroups.map((group) => (
               <Link to={`/group/${group.id}`} key={group.id} className="group-card-link">
                 <div className="group-card clickable">
                   <h4>{group.name} <span className="subject-tag">({group.subject})</span></h4>
@@ -89,10 +135,10 @@ const GroupDisplay = ({ searchQuery }) => {
               </Link>
             ))
           ) : (
-            <p>No matching groups found.</p>
+            <p>You haven’t joined any groups yet.</p>
           )}
         </div>
-  
+
         <div className="group-panel recommended-panel">
           <h2>Recommended Groups</h2>
           {recommendations.map((group) => (
