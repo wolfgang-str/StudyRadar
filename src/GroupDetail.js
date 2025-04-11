@@ -5,12 +5,15 @@ import axios from 'axios';
 const GroupDetail = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const token = localStorage.getItem('access_token');
+  const currentUser = localStorage.getItem('first_name')?.toLowerCase();
 
   const [group, setGroup] = useState(null);
   const [error, setError] = useState(null);
   const [hasJoined, setHasJoined] = useState(false);
-  const token = localStorage.getItem('access_token');
-  const currentUser = localStorage.getItem('first_name')?.toLowerCase();
+  const [events, setEvents] = useState([]);
+  const [newEvent, setNewEvent] = useState({ name: '', location: '', date: '', time: '', description: '' });
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -22,9 +25,11 @@ const GroupDetail = () => {
           }
         });
         setGroup(response.data);
+        if (response.data.events) {
+          setEvents(response.data.events);
+        }
       } catch (err) {
-        console.error("Failed to fetch group details:", err.message);
-        setError(err.message);
+        setError('Failed to fetch group details.');
       }
     };
 
@@ -33,133 +38,98 @@ const GroupDetail = () => {
 
   const handleJoin = async () => {
     try {
-      await axios.post(
-        `http://localhost:8000/api/groups/${groupId}/`, 
-        { action: "join" },  // payload if needed, adjust as per your backend
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+      await axios.post(`http://localhost:8000/api/groups/${groupId}/`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
-      // Update local state so the button is removed.
+      });
       setHasJoined(true);
-      // Optionally update group members: add current user.
-      if (group && currentUser) {
-        setGroup({
-          ...group,
-          members: [...group.members, currentUser]
-        });
-      }
     } catch (error) {
-      console.error("Error joining group:", error.response ? error.response.data : error);
-      // No need to display a success message if user has joined; any error will be shown.
-      // The backend should return an error if the user is already a member.
-      setError(
-        error.response && error.response.data && error.response.data.message
-          ? error.response.data.message
-          : "Unknown error"
-      );
+      setError("Error joining group");
     }
   };
 
-  if (error) {
-    return (
-      <p style={{ color: 'red', textAlign: 'center', fontSize: '1rem', marginTop: '20px' }}>
-        Error: {error}
-      </p>
-    );
-  }
+  const handleEventSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+  
+    const { name, location, date, time } = newEvent;
+  
+    if (!name || !location || !date || !time) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(`http://localhost:8000/api/groups/${groupId}/events/`, newEvent, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      setEvents([...events, response.data]);
+      setNewEvent({ name: '', location: '', date: '', time: '', description: '' });
+      setMessage('Event created successfully!');
+    } catch (err) {
+      setError('Failed to create event.');
+    }
+  };
 
-  if (!group) {
-    return (
-      <p style={{ textAlign: 'center', fontSize: '1rem', marginTop: '20px' }}>
-        Loading group details...
-      </p>
-    );
-  }
+  if (!group) return <p>Loading group details...</p>;
 
-  // Determine if the current user is already a member.
-  const isMember = group.members.some(
-    (member) => member.toLowerCase() === currentUser
-  );
+  const isMember = group.members.some(member => member.toLowerCase() === currentUser);
 
   return (
-    <div style={{
-      maxWidth: '800px',
-      margin: '40px auto',
-      padding: '20px',
-      backgroundColor: '#ffffff',
-      border: '2px solid #ddd',
-      borderRadius: '8px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.08)',
-      fontFamily: 'Arial, sans-serif'
-    }}>
-      <h2 style={{
-        textAlign: 'center',
-        marginBottom: '20px',
-        color: '#333'
-      }}>
-        {group.name}
-      </h2>
-      <p style={{ margin: '10px 0', fontSize: '1rem', color: '#444' }}>
-        <strong>Subject:</strong> {group.subject}
-      </p>
-      <p style={{ margin: '10px 0', fontSize: '1rem', color: '#444' }}>
-        <strong>Description:</strong> {group.description || "No description available."}
-      </p>
-      <p style={{ margin: '10px 0', fontSize: '1rem', color: '#444' }}>
-        <strong>Join Code:</strong> {group.join_code}
-      </p>
-      <p style={{ margin: '10px 0', fontSize: '1rem', color: '#444' }}>
-        <strong>Created by:</strong> {group.creator}
-      </p>
-      <p style={{ margin: '10px 0', fontSize: '1rem', color: '#444' }}>
-        <strong>Members:</strong> {group.members.length > 0 ? group.members.join(', ') : "No members yet."}
-      </p>
-      
-      {!hasJoined && !isMember ? (
-        <button
-          onClick={handleJoin}
-          style={{
-            display: 'block',
-            margin: '20px auto',
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            fontSize: '1rem',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          Join Group
-        </button>
-      ) : (
-        <p style={{
-          textAlign: 'center',
-          fontSize: '1rem',
-          fontWeight: 'bold',
-          color: 'green',
-          margin: '20px 0'
-        }}>
-          You are already a member of this group.
-        </p>
+    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '20px' }}>
+      <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '20px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+        <h2 style={{ textAlign: 'center', color: '#333' }}>{group.name}</h2>
+        <p><strong>Subject:</strong> {group.subject}</p>
+        <p><strong>Description:</strong> {group.description}</p>
+        <p><strong>Join Code:</strong> {group.join_code}</p>
+        <p><strong>Created by:</strong> {group.creator}</p>
+        <p><strong>Members:</strong> {group.members.join(', ')}</p>
+        {!hasJoined && !isMember ? (
+          <button onClick={handleJoin} style={{ margin: '10px 0' }}>Join Group</button>
+        ) : (
+          <p style={{ color: 'green' }}>You are already a member of this group.</p>
+        )}
+      </div>
+
+      <div style={{ marginTop: '30px' }}>
+        <h3>Group Events</h3>
+        {events.length > 0 ? (
+          events.map(event => (
+            <div key={event.id} style={{ background: '#f9f9f9', padding: '10px', marginBottom: '10px', borderRadius: '5px' }}>
+              <h4>{event.name}</h4>
+              <p><strong>Date:</strong> {event.date}</p>
+              <p><strong>Time:</strong> {event.time}</p>
+              <p><strong>Location:</strong> {event.location}</p>
+              <p>{event.description}</p>
+            </div>
+          ))
+        ) : <p>No events yet.</p>}
+      </div>
+
+      {isMember && (
+        <div style={{ marginTop: '30px' }}>
+          <h3>Create Event</h3>
+          <form onSubmit={handleEventSubmit}>
+            <input type="text" placeholder="Title" value={newEvent.name} onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })} required /><br />
+            <input type="text" placeholder="Location" value={newEvent.location} onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })} /><br />
+            <input type="date" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} /><br />
+            <input type="time" value={newEvent.time} onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })} /><br />
+            <textarea placeholder="Description" value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} /><br />
+            <button type="submit">Create Event</button>
+            {error && <p style={{ color: 'red', marginTop: '8px' }}>{error}</p>}
+            {message && <p style={{ color: 'green', marginTop: '8px' }}>{message}</p>}
+          </form>
+          {message && <p style={{ color: 'green' }}>{message}</p>}
+        </div>
       )}
 
-      <button onClick={() => navigate('/groups')} style={{
-        display: 'block',
-        margin: '20px auto',
-        padding: '8px 16px',
-        backgroundColor: '#6c757d',
-        color: '#fff',
-        fontSize: '0.9rem',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer'
-      }}>
+      <button onClick={() => navigate('/groups')} style={{ marginTop: '20px' }}>
         ← Back to Joined Groups
       </button>
     </div>

@@ -19,7 +19,7 @@ from django.views.generic import TemplateView
 from StudyRadar.views import *
 from .views import LoginView
 from .views import SignupView
-from .views import DashboardView, AboutusView, CreateGroupView
+from .views import DashboardView, AboutusView, CreateGroupView, StudyGroupSearchView, GroupDetailView, GroupEventListView, EventCreateView
 
 
 urlpatterns = [
@@ -31,7 +31,9 @@ urlpatterns = [
     path("api/create-group/", csrf_exempt(CreateGroupView.as_view())),
     path('about/', AboutusView.as_view(), name='about'),
     path('api/groups/<int:group_id>/', GroupDetailView.as_view(), name='group-detail'),
-    # path('api/create-group/', CreateGroupView.as_view(), name='create-group'),
+    path('api/search-groups/', csrf_exempt(StudyGroupSearchView.as_view())),
+    path('api/groups/<int:group_id>/events/', GroupEventListView.as_view()),
+    path('api/groups/<int:group_id>/create-event/', EventCreateView.as_view()),
 
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
     
