@@ -1,0 +1,25 @@
+.search-bar-wrapper {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 20px;          /* Bigger text */
+    font-weight: 500;         /* Optional: match boldness of placeholder */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Ensures the placeholder has the same style */
+  .search-input::placeholder {
+    font-size: 16px;
+    font-weight: 500;
+    color: #aaa; /* softer color, optional */
+  }
+  

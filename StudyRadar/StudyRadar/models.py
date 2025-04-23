@@ -30,20 +30,15 @@ class StudyGroup(models.Model):
     max_members = models.PositiveIntegerField(default=30)
     join_code = models.CharField(max_length=10, unique=True, null=True, blank=True)
 
+
+class Event(models.Model):
+    group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name="events")
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    date = models.DateField(null=True, blank=True)
+    time = models.TimeField(null=True, blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
-# class StudyGroup(models.Model):
-#     created_by = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='study_groups')
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_groups')
-#     major = models.CharField(max_length=100)
-#     meeting_location = models.CharField(max_length=100)
-#     meeting_start = models.DateTimeField()
-#     meeting_end = models.DateTimeField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"{self.course.name} ({self.major}) by {self.created_by.user.username} @ {self.meeting_location} from {self.meeting_start} to {self.meeting_end}"
-
-#     class Meta:
-#         unique_together = (("meeting_start", "meeting_end", "meeting_location"),)
 
 

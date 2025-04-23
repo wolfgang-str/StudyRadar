@@ -14,7 +14,7 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth.models import User 
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
-from StudyRadar.models import Student, StudyGroup
+from StudyRadar.models import Student, StudyGroup, Event
 import json
 
 # Login API
@@ -307,102 +307,7 @@ class CreateGroupView(APIView):
         except Exception as e:
             return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
 
-
-# class CreateGroupView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request):
-#         try:
-#             data = json.loads(request.body)
-#             class_name = data.get("className")
-#             meeting_location = data.get("location")
-#             meeting_start_str = data.get("meetingStart")
-#             meeting_end_str = data.get("meetingEnd")
-
-#             if not class_name or not meeting_location or not meeting_start_str or not meeting_end_str:
-#                 return JsonResponse({"message": "Missing required fields."}, status=400)
-
-#             # Parse meeting start and end; expecting ISO format strings
-#             meeting_start = datetime.fromisoformat(meeting_start_str)
-#             meeting_end = datetime.fromisoformat(meeting_end_str)
-
-#             # Retrieve the Student instance associated with the authenticated user
-#             student = Student.objects.get(user=request.user)
-#             # Use the student's major from their profile
-#             group_major = student.major
-
-#             # Find or create the course using the class name.
-#             course, created = Course.objects.get_or_create(
-#                 name=class_name, 
-#                 defaults={'dateTime': meeting_start, 'user_id': request.user}
-#             )
-            
-#             # Create the study group
-#             study_group = StudyGroup.objects.create(
-#                 created_by=student,
-#                 course=course,
-#                 major=group_major,
-#                 meeting_location=meeting_location,
-#                 meeting_start=meeting_start,
-#                 meeting_end=meeting_end
-#             )
-
-#             return JsonResponse({"message": "Study group created successfully."}, status=201)
-#         except json.JSONDecodeError:
-#             return JsonResponse({"message": "Invalid JSON format."}, status=400)
-#         except Student.DoesNotExist:
-#             return JsonResponse({"message": "Student profile not found."}, status=404)
-#         except Exception as e:
-#             return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
-
-class CreateGroupView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            class_name = data.get("className")
-            meeting_location = data.get("location")
-            meeting_start_str = data.get("meetingStart")
-            meeting_end_str = data.get("meetingEnd")
-
-            if not class_name or not meeting_location or not meeting_start_str or not meeting_end_str:
-                return JsonResponse({"message": "Missing required fields."}, status=400)
-
-            # Parse meeting start and end; expecting ISO format strings
-            meeting_start = datetime.fromisoformat(meeting_start_str)
-            meeting_end = datetime.fromisoformat(meeting_end_str)
-
-            # Retrieve the Student instance associated with the authenticated user
-            student = Student.objects.get(user=request.user)
-            # Use the student's major from their profile
-            group_major = student.major
-
-            # Find or create the course using the class name.
-            course, created = Course.objects.get_or_create(
-                name=class_name, 
-                defaults={'dateTime': meeting_start, 'user_id': request.user}
-            )
-            
-            # Create the study group
-            study_group = StudyGroup.objects.create(
-                created_by=student,
-                course=course,
-                major=group_major,
-                meeting_location=meeting_location,
-                meeting_start=meeting_start,
-                meeting_end=meeting_end
-            )
-
-            return JsonResponse({"message": "Study group created successfully."}, status=201)
-        except json.JSONDecodeError:
-            return JsonResponse({"message": "Invalid JSON format."}, status=400)
-        except Student.DoesNotExist:
-            return JsonResponse({"message": "Student profile not found."}, status=404)
-        except Exception as e:
-            return JsonResponse({"message": f"Server error: {str(e)}"}, status=500)
-
-
+@method_decorator(csrf_exempt, name='dispatch')  # Disable CSRF for this view
 class UserProfileView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -460,6 +365,15 @@ class GroupDetailView(APIView):
         creator_name = group.creator.first_name
         member_names = [m.first_name for m in members]
 
+        events_data = [{
+            "id": e.id,
+            "name": e.name,
+            "description": e.description,
+            "date": str(e.date),
+            "time": str(e.time),
+            "location": e.location,
+        } for e in group.events.all().order_by('-date')]
+
         return Response({
             "id": group.id,
             "name": group.name,
@@ -468,5 +382,170 @@ class GroupDetailView(APIView):
             "max_members": group.max_members,
             "join_code": group.join_code,
             "creator": creator_name,
-            "members": member_names
+            "members": member_names,
+            "events": events_data 
         })
+
+    def post(self, request, group_id):
+        """
+        Join the group with the given group_id.
+        """
+        try:
+            student = Student.objects.get(user=request.user)
+            group = get_object_or_404(StudyGroup, id=group_id)
+
+            # Check if already a member
+            if group.members.filter(id=student.id).exists():
+                return Response({"message": "You are already a member of this group"}, status=400)
+
+            # Check if the group has reached its capacity
+            if group.members.count() >= group.max_members:
+                return Response({"message": "This group is already full"}, status=400)
+
+            # Add the student to the group
+            group.members.add(student)
+            group.save()
+
+            return Response({"message": "Joined group successfully"}, status=200)
+
+        except Student.DoesNotExist:
+            return Response({"message": "Student profile not found"}, status=404)
+        except IntegrityError:
+            return Response({"message": "Database error: Could not join the group."}, status=500)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
+        
+@method_decorator(csrf_exempt, name='dispatch')  # Disable CSRF for this view
+class StudyGroupSearchView(APIView):
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get('q', '').strip().lower()
+        if not query or len(query) < 2:
+            return Response({"results": []})
+
+        # Get current student object
+        try:
+            student = Student.objects.get(user=request.user)
+        except Student.DoesNotExist:
+            return Response({"error": "Student profile not found"}, status=400)
+
+        # Get IDs of joined groups
+        joined_groups = student.study_groups.all()
+        joined_ids = joined_groups.values_list('id', flat=True)
+
+        # Tokenize and filter the query into keywords
+        keywords = query.split()
+        joined_keywords = [word for word in keywords if len(word) > 2]
+        keyword_freq = Counter(joined_keywords)
+
+        # Search groups by name, subject, join_code, or keyword in description
+        matched_groups = StudyGroup.objects.filter(
+            Q(name__icontains=query) |
+            Q(subject__icontains=query) |
+            Q(join_code__icontains=query) |
+            Q(description__icontains=query)
+        ).distinct()
+
+        # Convert to JSON response manually
+        results = []
+        for group in matched_groups:
+            results.append({
+                'id': group.id,
+                'name': group.name,
+                'description': group.description,
+                'subject': group.subject,
+                'join_code': group.join_code,
+            })
+
+        return Response({"results": results})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EventCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, group_id):
+        try:
+            student = Student.objects.get(user=request.user)
+            group = get_object_or_404(StudyGroup, id=group_id)
+
+            if student not in group.members.all():
+                return Response({"message": "Only group members can create events."}, status=403)
+
+            data = json.loads(request.body)
+            event = Event.objects.create(
+                group=group,
+                name=data.get("name"),
+                description=data.get("description", ""),
+                date=data.get("date"),
+                time=data.get("time"),
+                location=data.get("location", "")
+            )
+
+            return Response({"event": {
+                "id": event.id,
+                "name": event.name,
+                "description": event.description,
+                "date": str(event.date),
+                "time": str(event.time),
+                "location": event.location,
+            }}, status=201)
+
+        except Exception as e:
+            return Response({"message": f"Error creating event: {str(e)}"}, status=500)
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GroupEventListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, group_id):
+        group = get_object_or_404(StudyGroup, id=group_id)
+        events = group.events.all().order_by('-date')
+
+        data = [{
+            "id": event.id,
+            "name": event.name,
+            "description": event.description,
+            "date": str(event.date),
+            "time": str(event.time),
+            "location": event.location,
+        } for event in events]
+
+        return Response(data, status=200)
+
+    def post(self, request, group_id):
+        try:
+            student = Student.objects.get(user=request.user)
+            group = get_object_or_404(StudyGroup, id=group_id)
+
+            if student not in group.members.all():
+                return Response({"message": "Only group members can create events."}, status=403)
+
+            # Accept both raw JSON or request.data
+            data = request.data if request.content_type == 'application/json' else json.loads(request.body)
+
+            event = Event.objects.create(
+                group=group,
+                name=data.get("name"),
+                description=data.get("description", ""),
+                date=data.get("date"),
+                time=data.get("time"),
+                location=data.get("location", "")
+            )
+
+            return Response({
+                "id": event.id,
+                "name": event.name,
+                "description": event.description,
+                "date": str(event.date),
+                "time": str(event.time),
+                "location": event.location,
+            }, status=201)
+
+        except Exception as e:
+            return Response({"message": f"Error creating event: {str(e)}"}, status=500)
