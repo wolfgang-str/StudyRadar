@@ -27,7 +27,22 @@
   }
   
   .message {
-    color: green;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-size: 0.95em;
+  }
+  
+  .message.success {
+    background-color: #e6f7e6;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+  }
+  
+  .message.error {
+    background-color: #fcebea;
+    color: #c62828;
+    border: 1px solid #f5c6cb;
   }
 
   .back-button {
