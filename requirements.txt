@@ -1,0 +1,12 @@
+asgiref==3.8.1
+certifi==2024.8.30
+Django==5.2
+django-cors-headers==4.7.0
+django-extensions==4.0
+djangorestframework==3.16.0
+djangorestframework_simplejwt==5.5.0
+PyJWT==2.9.0
+PyMySQL==1.1.1
+python-dotenv==1.1.0
+sqlparse==0.5.3
+wheel @ file:///opt/homebrew/Cellar/python%403.12/3.12.5/libexec/wheel-0.44.0-py3-none-any.whl#sha256=8d8a590e50bda8422000110e90bc730ebfcd8363d2de80793ac819b7f252e97d
