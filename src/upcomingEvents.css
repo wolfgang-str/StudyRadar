@@ -1,0 +1,37 @@
+.event-section {
+  margin-top: 30px;
+  padding: 0 20px;
+}
+
+.event-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center; /* center the cards */
+}
+
+.event-card {
+  width: 300px; /* fixed width for uniform cards */
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.event-card:hover {
+  transform: scale(1.02);
+}
+
+.event-card h3 {
+  margin-bottom: 12px;
+  color: #222;
+  font-size: 1.2em;
+}
+
+.event-card p {
+  margin: 6px 0;
+  font-size: 0.95em;
+  color: #444;
+}

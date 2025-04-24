@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from StudyRadar.models import Student, StudyGroup, Event
+from django.utils.timezone import now 
 import json
 
 # Login API
@@ -336,6 +337,7 @@ class UserProfileView(APIView):
             student = Student.objects.get(user=request.user)
             data = request.data
 
+            # Update Student model
             student.first_name = data.get("firstName", student.first_name)
             student.last_name = data.get("lastName", student.last_name)
             student.email = data.get("email", student.email)
@@ -344,8 +346,20 @@ class UserProfileView(APIView):
             student.major = data.get("major", student.major)
             student.save()
 
-            # Update Django's User model email (if changed)
+            # Update Django User model
             request.user.email = student.email
+
+            # Handle password change if provided
+            new_password = data.get("newPassword")
+            confirm_password = data.get("confirmPassword")
+
+            if new_password or confirm_password:
+                if new_password != confirm_password:
+                    return Response({"message": "New passwords do not match with confirm"}, status=status.HTTP_400_BAD_REQUEST)
+                if len(new_password) < 6:
+                    return Response({"message": "Password must be at least 6 characters long"}, status=status.HTTP_400_BAD_REQUEST)
+                request.user.set_password(new_password)
+
             request.user.save()
 
             return Response({"message": "Profile updated successfully!"}, status=status.HTTP_200_OK)
@@ -549,3 +563,41 @@ class GroupEventListView(APIView):
 
         except Exception as e:
             return Response({"message": f"Error creating event: {str(e)}"}, status=500)
+
+
+class UpcomingEventsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            student = Student.objects.get(user=request.user)
+
+            # Get user's joined groups
+            joined_groups = student.study_groups.all()
+
+            # Fetch upcoming events from joined groups (using timezone-safe date)
+            upcoming_events = Event.objects.filter(
+                group__in=joined_groups,
+                date__gte=now().date()
+            ).order_by("date", "time")[:5]
+
+            events_data = [{
+                "id": event.id,
+                "name": event.name,
+                "description": event.description,
+                "date": str(event.date),
+                "time": str(event.time),
+                "location": event.location,
+                "group_name": event.group.name,
+            } for event in upcoming_events]
+
+            return Response({"upcoming_events": events_data}, status=200)
+
+        except Student.DoesNotExist:
+            print("Student profile not found.")
+            return Response({"message": "Student profile not found"}, status=404)
+
+        except Exception as e:
+            print(f"Unexpected error in UpcomingEventsView: {str(e)}")
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
