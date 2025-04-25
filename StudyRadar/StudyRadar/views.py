@@ -489,13 +489,17 @@ class EventCreateView(APIView):
                 return Response({"message": "Only group members can create events."}, status=403)
 
             data = json.loads(request.body)
+
+            if Event.objects.filter(group=group, name=data.get("name")).exists():
+                return Response({"message": "An event with this name already exists in this group."}, status=400)
+
             event = Event.objects.create(
                 group=group,
                 name=data.get("name"),
-                description=data.get("description", ""),
-                date=data.get("date"),
-                time=data.get("time"),
-                location=data.get("location", "")
+                description=data.get("description", "") or None,
+                date=data.get("date") or None,
+                time=data.get("time") or None,
+                location=data.get("location", "") or None
             )
 
             return Response({"event": {
@@ -580,7 +584,7 @@ class UpcomingEventsView(APIView):
             upcoming_events = Event.objects.filter(
                 group__in=joined_groups,
                 date__gte=now().date()
-            ).order_by("date", "time")[:5]
+            ).order_by("date", "time")[:4]
 
             events_data = [{
                 "id": event.id,

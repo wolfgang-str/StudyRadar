@@ -34,10 +34,10 @@ class StudyGroup(models.Model):
 class Event(models.Model):
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name="events")
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    description = models.TextField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
-    location = models.CharField(max_length=255, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
 
