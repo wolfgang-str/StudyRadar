@@ -34,7 +34,6 @@ urlpatterns = [
     path('api/search-groups/', csrf_exempt(StudyGroupSearchView.as_view())),
     path('api/groups/<int:group_id>/events/', GroupEventListView.as_view()),
     path('api/groups/<int:group_id>/create-event/', EventCreateView.as_view()),
-
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
     
 ]

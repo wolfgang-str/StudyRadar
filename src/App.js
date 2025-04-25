@@ -11,6 +11,7 @@ import GroupPage from "./GroupPage";
 import Layout from "./Layout"; 
 import GroupCreation from './GroupCreation';
 import GroupDetail from './GroupDetail';
+import EditGroup from "./EditGroup";
 
 
 
@@ -30,9 +31,10 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/create-group" element={<GroupCreation />} />
             <Route path="/group/:groupId" element={<GroupDetail />} />
+            <Route path="group/:groupId/edit" element={<EditGroup />} />
           </Route>
           <Route path="/about" element={<About />} />
-
+          
 
           {/* <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<UserProfile />} />
