@@ -16,7 +16,7 @@ function Dashboard() {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then((res) => {
-      console.log("📦 Response from /events/upcoming:", res.data);
+      console.log("Response from /events/upcoming:", res.data);
       setEvents(res.data.upcoming_events || []);
     })
     .catch((err) => {
@@ -46,7 +46,7 @@ function Dashboard() {
           </div>
         </div>
       ) : (
-        <p style={{ color: "red", marginTop: "30px" }}>No events to show (events.length = {events.length})</p>
+        <p style={{ color: "red", marginTop: "30px" }}>No events to show.</p>
       )}
     </div>
   );
