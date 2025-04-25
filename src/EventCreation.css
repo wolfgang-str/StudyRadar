@@ -58,12 +58,12 @@
 }
 
 .success-msg {
-  color: green;
+  color: green !important;
   margin-top: 20px;
 }
 
 .error-msg {
-  color: red;
+  color: red !important;
   margin-top: 20px;
 }
 

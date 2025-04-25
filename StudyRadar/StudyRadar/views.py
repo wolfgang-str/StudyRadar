@@ -442,11 +442,11 @@ class GroupDetailView(APIView):
             # Optional: validate required fields if provided
             if 'name' in data and not data['name'].strip():
                 return Response({"message": "Name cannot be blank."}, status=status.HTTP_400_BAD_REQUEST)
-            if 'subject' in data and not data['subject'].strip():
-                return Response({"message": "Subject cannot be blank."}, status=status.HTTP_400_BAD_REQUEST)
+            if 'subject' in data and data['subject'] is not None:
+                group.subject = data['subject'].strip() or None
 
             # Apply updates
-            for field in ('name', 'description', 'subject', 'max_members'):
+            for field in ('name', 'description', 'max_members'):
                 if field in data:
                     setattr(group, field, data[field])
             group.save()
@@ -640,7 +640,7 @@ class UpcomingEventsView(APIView):
             upcoming_events = Event.objects.filter(
                 group__in=joined_groups,
                 date__gte=now().date()
-            ).order_by("date", "time")[:5]
+            ).order_by("date", "time")[:4]
 
             events_data = [{
                 "id": event.id,
@@ -668,36 +668,40 @@ class EventDetailView(APIView):
     permission_classes     = [IsAuthenticated]
 
     def put(self, request, group_id, event_id):
-        """
-        Edit any event in the group—but only if request.user is the group's creator.
-        """
-        # identify student & group
         student = get_object_or_404(Student, user=request.user)
-        group   = get_object_or_404(StudyGroup, id=group_id)
+        group = get_object_or_404(StudyGroup, id=group_id)
 
-        # permission check
         if group.creator != student:
             return Response(
                 {"message": "Only the group owner may edit events."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # find the event within that group
         event = get_object_or_404(Event, id=event_id, group=group)
 
-        # update only allowed fields
         data = request.data
-        for field in ('name','description','date','time','location'):
-            if field in data:
-                setattr(event, field, data[field])
+
+        # Handle optional fields with null conversion
+        event.name = data.get("name", event.name)
+        event.description = data.get("description", event.description)
+
+        # Convert empty string to None for optional date/time
+        date_val = data.get("date")
+        event.date = date_val if date_val not in ["", None, "None"] else None
+
+        time_val = data.get("time")
+        event.time = time_val if time_val not in ["", None, "None"] else None
+
+        event.location = data.get("location", event.location)
+
         event.save()
 
         return Response({
             "id":          event.id,
             "name":        event.name,
             "description": event.description,
-            "date":        str(event.date),
-            "time":        str(event.time),
+            "date":        str(event.date) if event.date else None,
+            "time":        str(event.time) if event.time else None,
             "location":    event.location,
         }, status=status.HTTP_200_OK)
 
@@ -717,3 +721,5 @@ class EventDetailView(APIView):
         event = get_object_or_404(Event, id=event_id, group=group)
         event.delete()
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    
+

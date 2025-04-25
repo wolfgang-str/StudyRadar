@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import EventCreation from "./EventCreation";
 import "./EventCreation.css";
+
 
 const GroupDetail = () => {
   const { groupId } = useParams();
@@ -13,14 +15,14 @@ const GroupDetail = () => {
   const [group, setGroup] = useState(null);
   const [events, setEvents] = useState([]);
 
-  // New-event form
-  const [newEvent, setNewEvent] = useState({
-    name: "",
-    location: "",
-    date: "",
-    time: "",
-    description: "",
-  });
+  // // New-event form
+  // const [newEvent, setNewEvent] = useState({
+  //   name: "",
+  //   location: "",
+  //   date: "",
+  //   time: "",
+  //   description: "",
+  // });
 
   // Edit-event form
   const [editingEventId, setEditingEventId] = useState(null);
@@ -54,13 +56,23 @@ const GroupDetail = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setGroup(data);
-        setEvents(data.events || []);
+        const sortedEvents = (data.events || []).sort(
+          (a, b) => new Date(a.date) - new Date(b.date)
+        );
+        setEvents(sortedEvents);
       } catch {
         setError("Failed to fetch group details.");
       }
     };
     fetch();
   }, [groupId, token]);
+
+  const handleNewEvent = (newEvent) => {
+    const updatedEvents = [...events, newEvent].sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+    setEvents(updatedEvents);
+  };
 
   if (!group) return <p>Loading group details...</p>;
 
@@ -76,9 +88,9 @@ const GroupDetail = () => {
     setMessage(null);
     setGroupEditData({
       name: group.name,
-      subject: group.subject,
+      subject: group.subject || "",
       description: group.description || "",
-      max_members: group.max_members,
+      max_members: group.max_members || "30",
     });
     setEditingGroup(true);
   };
@@ -116,7 +128,6 @@ const GroupDetail = () => {
     }
   };
 
-  // — Join / Leave Handlers —
   const handleJoin = async () => {
     try {
       await axios.post(
@@ -143,40 +154,10 @@ const GroupDetail = () => {
       setMessage("You have left the group.");
       setGroup((prev) => ({
         ...prev,
-        members: prev.members.filter(
-          (m) => m.toLowerCase() !== currentUser
-        ),
+        members: prev.members.filter((m) => m.toLowerCase() !== currentUser),
       }));
     } catch {
       setError("Error leaving group");
-    }
-  };
-
-  // — Event Create/Edit/Delete Handlers —
-  const handleEventSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    const { name, location, date, time } = newEvent;
-    if (!name || !location || !date || !time) {
-      return setError("Please fill in all required fields.");
-    }
-    try {
-      const { data } = await axios.post(
-        `http://localhost:8000/api/groups/${groupId}/events/`,
-        newEvent,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setEvents((ev) => [...ev, data]);
-      setNewEvent({
-        name: "",
-        location: "",
-        date: "",
-        time: "",
-        description: "",
-      });
-      setMessage("Event created successfully!");
-    } catch {
-      setError("Failed to create event.");
     }
   };
 
@@ -207,14 +188,20 @@ const GroupDetail = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Convert empty strings for date/time to null
+      const payload = {
+        ...editEventData,
+        date: editEventData.date || null,
+        time: editEventData.time || null,
+      };
+  
       const { data } = await axios.put(
         `http://localhost:8000/api/groups/${groupId}/events/${editingEventId}/`,
-        editEventData,
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setEvents((ev) =>
-        ev.map((x) => (x.id === editingEventId ? data : x))
-      );
+  
+      setEvents((ev) => ev.map((x) => (x.id === editingEventId ? data : x)));
       setMessage("Event updated successfully!");
       setEditingEventId(null);
     } catch {
@@ -263,7 +250,6 @@ const GroupDetail = () => {
               placeholder="Subject"
               value={groupEditData.subject}
               onChange={handleGroupChange}
-              required
             />
             <br />
             <textarea
@@ -280,7 +266,6 @@ const GroupDetail = () => {
               placeholder="Max Members"
               value={groupEditData.max_members}
               onChange={handleGroupChange}
-              required
             />
             <br />
             <button
@@ -398,16 +383,13 @@ const GroupDetail = () => {
                   placeholder="Title"
                   value={editEventData.name}
                   onChange={handleEditChange}
-                  required
                 />
-                <br />
                 <input
                   name="location"
                   type="text"
                   placeholder="Location"
                   value={editEventData.location}
                   onChange={handleEditChange}
-                  required
                 />
                 <br />
                 <input
@@ -415,7 +397,6 @@ const GroupDetail = () => {
                   type="date"
                   value={editEventData.date}
                   onChange={handleEditChange}
-                  required
                 />
                 <br />
                 <input
@@ -423,7 +404,6 @@ const GroupDetail = () => {
                   type="time"
                   value={editEventData.time}
                   onChange={handleEditChange}
-                  required
                 />
                 <br />
                 <textarea
@@ -456,82 +436,10 @@ const GroupDetail = () => {
       {isMember && (
         <div style={{ marginTop: 30 }}>
           <h3>Create Event</h3>
-          <form onSubmit={handleEventSubmit}>
-            <input
-              name="name"
-              type="text"
-              placeholder="Title"
-              value={newEvent.name}
-              onChange={(e) =>
-                setNewEvent((prev) => ({
-                  ...prev,
-                  name: e.target.value,
-                }))
-              }
-              required
-            />
-            <br />
-            <input
-              name="location"
-              type="text"
-              placeholder="Location"
-              value={newEvent.location}
-              onChange={(e) =>
-                setNewEvent((prev) => ({
-                  ...prev,
-                  location: e.target.value,
-                }))
-              }
-              required
-            />
-            <br />
-            <input
-              name="date"
-              type="date"
-              value={newEvent.date}
-              onChange={(e) =>
-                setNewEvent((prev) => ({
-                  ...prev,
-                  date: e.target.value,
-                }))
-              }
-              required
-            />
-            <br />
-            <input
-              name="time"
-              type="time"
-              value={newEvent.time}
-              onChange={(e) =>
-                setNewEvent((prev) => ({
-                  ...prev,
-                  time: e.target.value,
-                }))
-              }
-              required
-            />
-            <br />
-            <textarea
-              name="description"
-              placeholder="Description"
-              value={newEvent.description}
-              onChange={(e) =>
-                setNewEvent((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-            />
-            <br />
-            <button
-              type="submit"
-              style={{ border: "2px solid black" }}
-            >
-              Create Event
-            </button>
-          </form>
+          <EventCreation groupId={groupId} onEventCreated={handleNewEvent} existingEvents={events}/>
         </div>
       )}
+
 
       {/* — Back Button — */}
       <button

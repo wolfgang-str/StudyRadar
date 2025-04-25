@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import './EventCreation.css';
 
-const EventCreation = () => {
+const EventCreation = ({ groupId, onEventCreated, existingEvents = [] }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [location, setLocation] = useState('');
+  const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -20,14 +21,29 @@ const EventCreation = () => {
       return;
     }
 
-    const groupData = {
+    if (!name.trim()) {
+      setError('Event name is required.');
+      return;
+    }
+
+    const duplicate = existingEvents.some(
+      (ev) => ev.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (duplicate) {
+      setError('An event with this name already exists.');
+      return;
+    }
+
+    const eventData = {
       name,
       description,
-      subject,
+      date: date || null,
+      time: time || null,
+      location,
     };
 
     try {
-      const response = await fetch('http://localhost:8000/api/create-event/', {
+      const response = await fetch(`http://localhost:8000/api/groups/${groupId}/create-event/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -41,7 +57,15 @@ const EventCreation = () => {
         setMessage(`Event "${data.event.name}" created successfully!`);
         setName('');
         setDescription('');
-        setSubject('');
+        setDate('');
+        setTime('');
+        setLocation('');
+
+        // 🔁 Trigger update in parent
+        if (onEventCreated) {
+          onEventCreated(data.event);
+        }
+
       } else {
         setError(data.message || 'Failed to create event.');
       }
@@ -52,24 +76,24 @@ const EventCreation = () => {
 
   return (
     <div className="event-create-wrapper">
-      <h2>Create an event</h2>
+      <h2>Create Event</h2>
       <form className="event-form" onSubmit={handleSubmit}>
-        <label>Event Title </label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+        <label>Event Title<span className="required-label"> (required)</span></label>
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
 
-        <label>Location <span style={{ fontWeight: 'normal', color: '#888' }}>(optional)</span></label>
-        <input type="text" value={location} onChange={(e) => setSubject(e.target.value)} />
+        <label>Location<span className="optional-label"> (optional)</span></label>
+        <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} />
 
-        <label>Date <span style={{ fontWeight: 'normal', color: '#888' }}>(optional)</span></label>
-        <textarea value={date} onChange={(e) => setDescription(e.target.value)} />
-        
-	<label>Time <span style={{ fontWeight: 'normal', color: '#888' }}>(optional)</span></label>
-        <textarea value={time} onChange={(e) => setDescription(e.target.value)} />
+        <label>Date<span className="optional-label"> (optional)</span></label>
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
 
-        <label>Description <span style={{ fontWeight: 'normal', color: '#888' }}>(optional)</span></label>
+        <label>Time<span className="optional-label"> (optional)</span></label>
+        <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+
+        <label>Description<span className="optional-label"> (optional)</span></label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
 
-        <button type="submit">Create Group</button>
+        <button type="submit">Create Event</button>
       </form>
       {message && <p className="success-msg">{message}</p>}
       {error && <p className="error-msg">{error}</p>}
