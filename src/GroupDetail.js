@@ -167,7 +167,13 @@ const GroupDetail = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEvents((ev) => [...ev, data]);
-      setNewEvent({ name: "", location: "", date: "", time: "", description: "" });
+      setNewEvent({
+        name: "",
+        location: "",
+        date: "",
+        time: "",
+        description: "",
+      });
       setMessage("Event created successfully!");
     } catch {
       setError("Failed to create event.");
@@ -277,10 +283,17 @@ const GroupDetail = () => {
               required
             />
             <br />
-            <button type="submit" style={{ marginRight: 8 }}>
+            <button
+              type="submit"
+              style={{ marginRight: 8, border: "2px solid black" }}
+            >
               Save
             </button>
-            <button type="button" onClick={cancelGroupEdit}>
+            <button
+              type="button"
+              onClick={cancelGroupEdit}
+              style={{ border: "2px solid black" }}
+            >
               Cancel
             </button>
           </form>
@@ -305,7 +318,7 @@ const GroupDetail = () => {
             {isGroupOwner && (
               <button
                 onClick={startGroupEdit}
-                style={{ margin: "10px 0" }}
+                style={{ margin: "10px 0", border: "2px solid black" }}
               >
                 Edit Group
               </button>
@@ -315,23 +328,21 @@ const GroupDetail = () => {
 
         {/* Join / Leave */}
         {!isMember ? (
-          <button onClick={handleJoin}>Join Group</button>
+          <button style={{ border: "2px solid black" }} onClick={handleJoin}>
+            Join Group
+          </button>
         ) : (
           <button
             onClick={handleLeave}
-            style={{ background: "#e74c3c", color: "#fff" }}
+            style={{ border: "2px solid black", background: "#e74c3c", color: "#fff" }}
           >
             Leave Group
           </button>
         )}
 
         {/* Feedback */}
-        {error && (
-          <p style={{ color: "red", marginTop: 8 }}>{error}</p>
-        )}
-        {message && (
-          <p style={{ color: "green", marginTop: 8 }}>{message}</p>
-        )}
+        {error && <p style={{ color: "red", marginTop: 8 }}>{error}</p>}
+        {message && <p style={{ color: "green", marginTop: 8 }}>{message}</p>}
       </div>
 
       {/* — Events List & Edit/Delete — */}
@@ -366,13 +377,13 @@ const GroupDetail = () => {
                   <div style={{ marginTop: 10 }}>
                     <button
                       onClick={() => startEdit(ev)}
-                      style={{ marginRight: 8 }}
+                      style={{ marginRight: 8, border: "2px solid black" }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteEvent(ev.id)}
-                      style={{ background: "#e74c3c", color: "#fff" }}
+                      style={{ border: "2px solid black", background: "#e74c3c", color: "#fff" }}
                     >
                       Delete
                     </button>
@@ -380,10 +391,7 @@ const GroupDetail = () => {
                 )}
               </>
             ) : (
-              <form
-                onSubmit={handleEditSubmit}
-                style={{ marginTop: 10 }}
-              >
+              <form onSubmit={handleEditSubmit} style={{ marginTop: 10 }}>
                 <input
                   name="name"
                   type="text"
@@ -427,13 +435,14 @@ const GroupDetail = () => {
                 <br />
                 <button
                   type="submit"
-                  style={{ marginRight: 8 }}
+                  style={{ marginRight: 8, border: "2px solid black" }}
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={cancelEdit}
+                  style={{ border: "2px solid black" }}
                 >
                   Cancel
                 </button>
@@ -514,7 +523,12 @@ const GroupDetail = () => {
               }
             />
             <br />
-            <button type="submit">Create Event</button>
+            <button
+              type="submit"
+              style={{ border: "2px solid black" }}
+            >
+              Create Event
+            </button>
           </form>
         </div>
       )}
@@ -522,7 +536,7 @@ const GroupDetail = () => {
       {/* — Back Button — */}
       <button
         onClick={() => navigate("/groups")}
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 20, border: "2px solid black" }}
       >
         ← Back to Joined Groups
       </button>
