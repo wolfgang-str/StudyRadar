@@ -356,8 +356,8 @@ class UserProfileView(APIView):
             if new_password or confirm_password:
                 if new_password != confirm_password:
                     return Response({"message": "New passwords do not match with confirm"}, status=status.HTTP_400_BAD_REQUEST)
-                if len(new_password) < 6:
-                    return Response({"message": "Password must be at least 6 characters long"}, status=status.HTTP_400_BAD_REQUEST)
+                if len(new_password) < 8:
+                    return Response({"message": "Password must be at least 8 characters long"}, status=status.HTTP_400_BAD_REQUEST)
                 request.user.set_password(new_password)
 
             request.user.save()

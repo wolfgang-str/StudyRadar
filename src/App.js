@@ -32,11 +32,6 @@ function App() {
             <Route path="/group/:groupId" element={<GroupDetail />} />
           </Route>
           <Route path="/about" element={<About />} />
-
-
-          {/* <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/groups" element={<GroupPage />} /> */}
         </Routes>
       </div>
     </Router>
