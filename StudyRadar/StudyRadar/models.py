@@ -37,7 +37,7 @@ class Event(models.Model):
     description = models.TextField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
-    location = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
 

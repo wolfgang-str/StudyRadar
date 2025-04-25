@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './EventCreation.css';
 
-const EventCreation = ({ groupId, onEventCreated }) => {
+const EventCreation = ({ groupId, onEventCreated, existingEvents = [] }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
@@ -26,11 +26,19 @@ const EventCreation = ({ groupId, onEventCreated }) => {
       return;
     }
 
+    const duplicate = existingEvents.some(
+      (ev) => ev.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (duplicate) {
+      setError('An event with this name already exists.');
+      return;
+    }
+
     const eventData = {
       name,
       description,
-      date,
-      time,
+      date: date || null,
+      time: time || null,
       location,
     };
 

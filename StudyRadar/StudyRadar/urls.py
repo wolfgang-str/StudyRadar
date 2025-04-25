@@ -32,9 +32,10 @@ urlpatterns = [
     path('about/', AboutusView.as_view(), name='about'),
     path('api/groups/<int:group_id>/', GroupDetailView.as_view(), name='group-detail'),
     path('api/search-groups/', csrf_exempt(StudyGroupSearchView.as_view())),
-    path('api/groups/<int:group_id>/events/', csrf_exempt(GroupEventListView.as_view())),
-    path('api/groups/<int:group_id>/create-event/', csrf_exempt(EventCreateView.as_view())),
+    path('api/groups/<int:group_id>/events/', GroupEventListView.as_view()),
+    path('api/groups/<int:group_id>/create-event/', EventCreateView.as_view()),
     path("api/events/upcoming/", UpcomingEventsView.as_view(), name="upcoming-events"),
+    path('api/groups/<int:group_id>/events/<int:event_id>/', EventDetailView.as_view(), name='event-detail'),
     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='react_app'),
 
     

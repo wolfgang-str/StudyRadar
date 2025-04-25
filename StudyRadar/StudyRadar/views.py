@@ -368,10 +368,10 @@ class UserProfileView(APIView):
             return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 class GroupDetailView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes     = [IsAuthenticated]
 
     def get(self, request, group_id):
         group = get_object_or_404(StudyGroup, id=group_id)
@@ -398,7 +398,7 @@ class GroupDetailView(APIView):
             "creator": creator_name,
             "members": member_names,
             "events": events_data 
-        })
+        }, status=status.HTTP_200_OK)
 
     def post(self, request, group_id):
         """
@@ -408,26 +408,85 @@ class GroupDetailView(APIView):
             student = Student.objects.get(user=request.user)
             group = get_object_or_404(StudyGroup, id=group_id)
 
-            # Check if already a member
             if group.members.filter(id=student.id).exists():
-                return Response({"message": "You are already a member of this group"}, status=400)
+                return Response({"message": "You are already a member of this group"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Check if the group has reached its capacity
             if group.members.count() >= group.max_members:
-                return Response({"message": "This group is already full"}, status=400)
+                return Response({"message": "This group is already full"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Add the student to the group
             group.members.add(student)
-            group.save()
-
-            return Response({"message": "Joined group successfully"}, status=200)
+            return Response({"message": "Joined group successfully"}, status=status.HTTP_200_OK)
 
         except Student.DoesNotExist:
-            return Response({"message": "Student profile not found"}, status=404)
-        except IntegrityError:
-            return Response({"message": "Database error: Could not join the group."}, status=500)
+            return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, group_id):
+        """
+        Edit group details—only the group's creator may update.
+        """
+        try:
+            student = Student.objects.get(user=request.user)
+            group = get_object_or_404(StudyGroup, id=group_id)
+
+            # Only the creator can edit
+            if group.creator != student:
+                return Response(
+                    {"message": "Only the group owner may edit this group."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            data = request.data
+
+            # Optional: validate required fields if provided
+            if 'name' in data and not data['name'].strip():
+                return Response({"message": "Name cannot be blank."}, status=status.HTTP_400_BAD_REQUEST)
+            if 'subject' in data and data['subject'] is not None:
+                group.subject = data['subject'].strip() or None
+
+            # Apply updates
+            for field in ('name', 'description', 'max_members'):
+                if field in data:
+                    setattr(group, field, data[field])
+            group.save()
+
+            # Return the updated group
+            return Response({
+                "id": group.id,
+                "name": group.name,
+                "description": group.description,
+                "subject": group.subject,
+                "max_members": group.max_members,
+                "join_code": group.join_code,
+                "creator": group.creator.first_name,
+                "members": [m.first_name for m in group.members.all()],
+            }, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def delete(self, request, group_id):
+        """
+        Leave the group with the given group_id.
+        """
+        try:
+            student = Student.objects.get(user=request.user)
+            group = get_object_or_404(StudyGroup, id=group_id)
+
+            if not group.members.filter(id=student.id).exists():
+                return Response({"message": "You are not a member of this group"}, status=status.HTTP_400_BAD_REQUEST)
+
+            group.members.remove(student)
+            return Response({"message": "Left group successfully"}, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({"message": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         
 @method_decorator(csrf_exempt, name='dispatch')  # Disable CSRF for this view
 class StudyGroupSearchView(APIView):
@@ -489,17 +548,13 @@ class EventCreateView(APIView):
                 return Response({"message": "Only group members can create events."}, status=403)
 
             data = json.loads(request.body)
-
-            if Event.objects.filter(group=group, name=data.get("name")).exists():
-                return Response({"message": "An event with this name already exists in this group."}, status=400)
-
             event = Event.objects.create(
                 group=group,
                 name=data.get("name"),
-                description=data.get("description", "") or None,
-                date=data.get("date") or None,
-                time=data.get("time") or None,
-                location=data.get("location", "") or None
+                description=data.get("description", ""),
+                date=data.get("date"),
+                time=data.get("time"),
+                location=data.get("location", "")
             )
 
             return Response({"event": {
@@ -553,7 +608,8 @@ class GroupEventListView(APIView):
                 description=data.get("description", ""),
                 date=data.get("date"),
                 time=data.get("time"),
-                location=data.get("location", "")
+                location=data.get("location", ""),
+                
             )
 
             return Response({
@@ -605,3 +661,65 @@ class UpcomingEventsView(APIView):
         except Exception as e:
             print(f"Unexpected error in UpcomingEventsView: {str(e)}")
             return Response({"message": f"Unexpected error: {str(e)}"}, status=500)
+
+        
+class EventDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes     = [IsAuthenticated]
+
+    def put(self, request, group_id, event_id):
+        student = get_object_or_404(Student, user=request.user)
+        group = get_object_or_404(StudyGroup, id=group_id)
+
+        if group.creator != student:
+            return Response(
+                {"message": "Only the group owner may edit events."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        event = get_object_or_404(Event, id=event_id, group=group)
+
+        data = request.data
+
+        # Handle optional fields with null conversion
+        event.name = data.get("name", event.name)
+        event.description = data.get("description", event.description)
+
+        # Convert empty string to None for optional date/time
+        date_val = data.get("date")
+        event.date = date_val if date_val not in ["", None, "None"] else None
+
+        time_val = data.get("time")
+        event.time = time_val if time_val not in ["", None, "None"] else None
+
+        event.location = data.get("location", event.location)
+
+        event.save()
+
+        return Response({
+            "id":          event.id,
+            "name":        event.name,
+            "description": event.description,
+            "date":        str(event.date) if event.date else None,
+            "time":        str(event.time) if event.time else None,
+            "location":    event.location,
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request, group_id, event_id):
+        """
+        Delete any event in the group—but only if request.user is the group's creator.
+        """
+        student = get_object_or_404(Student, user=request.user)
+        group   = get_object_or_404(StudyGroup, id=group_id)
+
+        if group.creator != student:
+            return Response(
+                {"message": "Only the group owner may delete events."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        event = get_object_or_404(Event, id=event_id, group=group)
+        event.delete()
+        return Response({"message": "Event deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    
+
