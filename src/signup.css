@@ -27,13 +27,22 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-  }input, button {
+  }
+  input, button {
     width: calc(100% - 20px); 
     max-width: 100%;
-  }.message {
-    color: red;
-    font-weight: normal;
-  }body {
+  }
+  .message {
+  color: red;
+  font-weight: normal;
+  margin-bottom: 10px;
+  }
+  
+  .message.success {
+  color: green;
+  }
+
+  body {
     background-color: #63666A; 
     display: flex;
     justify-content: center;
