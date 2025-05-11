@@ -115,3 +115,13 @@ body, html {
   box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15);
 }
 
+.group-card.search-result {
+  border-left: 5px solid #9c27b0; /* purple accent */
+  background-color: #f9f1ff; /* very light purple */
+  box-shadow: 0 2px 6px rgba(156, 39, 176, 0.1); /* soft purple shadow */
+}
+
+.group-card.search-result.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.15);
+}
